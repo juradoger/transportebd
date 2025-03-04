@@ -12,6 +12,7 @@ class CreateRutaTable extends Migration
             $table->id();
             $table->string('origen', 100);
             $table->string('destino', 100);
+            $table->string('duracion')->nullable();
             $table->time('horario')->nullable();
             $table->timestamps();
         });
