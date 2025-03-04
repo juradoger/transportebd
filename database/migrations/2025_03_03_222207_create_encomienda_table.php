@@ -23,6 +23,9 @@ class CreateEncomiendaTable extends Migration
             $table->date('fecha_envio');
             $table->date('fecha_entrega')->nullable();
             $table->unsignedBigInteger('usuario_id');
+            $table->string('nombre_destinatario', 100); // Nuevo campo
+            $table->string('telefono_destinatario', 20); // Nuevo campo
+            $table->string('correo_destinatario', 100); // Nuevo campo
             $table->foreign('usuario_id')->references('id')->on('usuario')->onDelete('cascade');
             $table->timestamps();
         });

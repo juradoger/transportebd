@@ -236,254 +236,286 @@
                 </div>
             </div>
 
-            <!-- Envío de Paquetes -->
-            <div x-show="activeTab === 'shipping'" class="py-6">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h1 class="text-2xl font-semibold text-white mb-6">Envío de Paquetes</h1>
 
-                    <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700">
-                        <div class="p-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <!-- Formulario de envío -->
+
+<!-- Envío de Paquetes -->
+<div x-show="activeTab === 'shipping'" class="py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-2xl font-semibold text-white mb-6">Envío de Paquetes</h1>
+        
+        <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700">
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Formulario de envío -->
+                    <div>
+                        <h2 class="text-lg font-medium text-white mb-4">Detalles del Paquete</h2>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Tipo de Paquete</label>
+                                <select 
+                                    x-model="packageForm.type"
+                                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
+                                >
+                                    <option value="document">Documento</option>
+                                    <option value="small">Paquete Pequeño</option>
+                                    <option value="medium">Paquete Mediano</option>
+                                    <option value="large">Paquete Grande</option>
+                                    <option value="special">Carga Especial</option>
+                                </select>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <h2 class="text-lg font-medium text-white mb-4">Detalles del Paquete</h2>
-
-                                    <div class="space-y-4">
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-300 mb-1">Tipo de Paquete</label>
-                                            <select
-                                                x-model="packageForm.type"
-                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]">
-                                                <option value="document">Documento</option>
-                                                <option value="small">Paquete Pequeño</option>
-                                                <option value="medium">Paquete Mediano</option>
-                                                <option value="large">Paquete Grande</option>
-                                                <option value="special">Carga Especial</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-300 mb-1">Peso (kg)</label>
-                                                <input
-                                                    type="number"
-                                                    x-model="packageForm.weight"
-                                                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                                    placeholder="0.5"
-                                                    step="0.1"
-                                                    min="0.1" />
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-300 mb-1">Valor Declarado ($)</label>
-                                                <input
-                                                    type="number"
-                                                    x-model="packageForm.value"
-                                                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                                    placeholder="100"
-                                                    step="1"
-                                                    min="0" />
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-300 mb-1">Dimensiones</label>
-                                            <div class="grid grid-cols-3 gap-2">
-                                                <div>
-                                                    <input
-                                                        type="number"
-                                                        x-model="packageForm.length"
-                                                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                                        placeholder="Largo (cm)"
-                                                        min="1" />
-                                                </div>
-                                                <div>
-                                                    <input
-                                                        type="number"
-                                                        x-model="packageForm.width"
-                                                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                                        placeholder="Ancho (cm)"
-                                                        min="1" />
-                                                </div>
-                                                <div>
-                                                    <input
-                                                        type="number"
-                                                        x-model="packageForm.height"
-                                                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                                        placeholder="Alto (cm)"
-                                                        min="1" />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-300 mb-1">Descripción del Contenido</label>
-                                            <textarea
-                                                x-model="packageForm.description"
-                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                                placeholder="Describa el contenido del paquete"
-                                                rows="2"></textarea>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-300 mb-1">Origen</label>
-                                            <select
-                                                x-model="packageForm.origin"
-                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]">
-                                                <option value="">Seleccionar ciudad</option>
-                                                <option>Ciudad de México</option>
-                                                <option>Guadalajara</option>
-                                                <option>Monterrey</option>
-                                                <option>Puebla</option>
-                                                <option>Tijuana</option>
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-300 mb-1">Destino</label>
-                                            <select
-                                                x-model="packageForm.destination"
-                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]">
-                                                <option value="">Seleccionar ciudad</option>
-                                                <option>Ciudad de México</option>
-                                                <option>Guadalajara</option>
-                                                <option>Monterrey</option>
-                                                <option>Puebla</option>
-                                                <option>Tijuana</option>
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-300 mb-1">Datos del Destinatario</label>
-                                            <input
-                                                type="text"
-                                                x-model="packageForm.recipientName"
-                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995] mb-2"
-                                                placeholder="Nombre completo" />
-                                            <input
-                                                type="text"
-                                                x-model="packageForm.recipientPhone"
-                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995] mb-2"
-                                                placeholder="Teléfono" />
-                                            <input
-                                                type="email"
-                                                x-model="packageForm.recipientEmail"
-                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                                placeholder="Correo electrónico" />
-                                        </div>
-
-                                        <button
-                                            @click="calculateShipping"
-                                            class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center">
-                                            <span class="mr-2">Calcular Envío</span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                                <polyline points="12 5 19 12 12 19"></polyline>
-                                            </svg>
-                                        </button>
-                                    </div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-1">Peso (kg)</label>
+                                    <input 
+                                        type="number" 
+                                        x-model="packageForm.weight"
+                                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
+                                        placeholder="0.5"
+                                        step="0.1"
+                                        min="0.1"
+                                    />
                                 </div>
-
-                                <!-- Resumen y QR -->
-                                <div x-show="showShippingSummary" class="bg-gray-700 rounded-xl p-6">
-                                    <h2 class="text-lg font-medium text-white mb-4">Resumen del Envío</h2>
-
-                                    <div class="space-y-4">
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-300">Tipo de Paquete:</span>
-                                            <span class="text-white font-medium" x-text="getPackageTypeName(packageForm.type)"></span>
-                                        </div>
-
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-300">Peso:</span>
-                                            <span class="text-white font-medium" x-text="packageForm.weight + ' kg'"></span>
-                                        </div>
-
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-300">Dimensiones:</span>
-                                            <span class="text-white font-medium" x-text="packageForm.length + '×' + packageForm.width + '×' + packageForm.height + ' cm'"></span>
-                                        </div>
-
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-300">Origen:</span>
-                                            <span class="text-white font-medium" x-text="packageForm.origin"></span>
-                                        </div>
-
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-300">Destino:</span>
-                                            <span class="text-white font-medium" x-text="packageForm.destination"></span>
-                                        </div>
-
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-300">Destinatario:</span>
-                                            <span class="text-white font-medium" x-text="packageForm.recipientName"></span>
-                                        </div>
-
-                                        <div class="border-t border-gray-600 my-4 pt-4">
-                                            <div class="flex justify-between text-lg">
-                                                <span class="text-gray-300">Costo de Envío:</span>
-                                                <span class="text-white font-bold" x-text="'$' + shippingCost.toFixed(2)"></span>
-                                            </div>
-
-                                            <div class="flex justify-between text-sm mt-2">
-                                                <span class="text-gray-300">Tiempo estimado:</span>
-                                                <span class="text-white" x-text="estimatedDeliveryTime"></span>
-                                            </div>
-                                        </div>
-
-                                        <!-- QR de seguimiento -->
-                                        <div class="mt-6 flex flex-col items-center">
-                                            <h3 class="text-md font-medium text-white mb-2">Código de Seguimiento</h3>
-                                            <div class="bg-white p-2 rounded-lg mb-2">
-                                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=TRACK12345678" alt="QR Code" class="w-32 h-32" />
-                                            </div>
-                                            <p class="text-sm text-gray-300">TRACK12345678</p>
-                                            <p class="text-xs text-gray-400 mt-1">Escanea para seguimiento en tiempo real</p>
-                                        </div>
-
-                                        <!-- Estado del envío -->
-                                        <div class="mt-4">
-                                            <h3 class="text-md font-medium text-white mb-2">Estado del Envío</h3>
-                                            <div class="relative">
-                                                <div class="absolute inset-0 flex items-center">
-                                                    <div class="h-0.5 w-full bg-gray-600"></div>
-                                                </div>
-                                                <div class="relative flex justify-between">
-                                                    <div>
-                                                        <div class="h-4 w-4 rounded-full bg-[#037995] flex items-center justify-center"></div>
-                                                        <div class="text-xs text-gray-400 mt-1">Registrado</div>
-                                                    </div>
-                                                    <div>
-                                                        <div class="h-4 w-4 rounded-full bg-gray-600 flex items-center justify-center"></div>
-                                                        <div class="text-xs text-gray-400 mt-1">En proceso</div>
-                                                    </div>
-                                                    <div>
-                                                        <div class="h-4 w-4 rounded-full bg-gray-600 flex items-center justify-center"></div>
-                                                        <div class="text-xs text-gray-400 mt-1">En tránsito</div>
-                                                    </div>
-                                                    <div>
-                                                        <div class="h-4 w-4 rounded-full bg-gray-600 flex items-center justify-center"></div>
-                                                        <div class="text-xs text-gray-400 mt-1">Entregado</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <button
-                                            @click="proceedToPayment('shipping')"
-                                            class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center mt-6">
-                                            <span class="mr-2">Proceder al Pago</span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                                                <line x1="1" y1="10" x2="23" y2="10"></line>
-                                            </svg>
-                                        </button>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-1">Valor Declarado ($)</label>
+                                    <input 
+                                        type="number" 
+                                        x-model="packageForm.value"
+                                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
+                                        placeholder="100"
+                                        step="1"
+                                        min="0"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Dimensiones</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div>
+                                        <input 
+                                            type="number" 
+                                            x-model="packageForm.length"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
+                                            placeholder="Largo (cm)"
+                                            min="1"
+                                        />
+                                    </div>
+                                    <div>
+                                        <input 
+                                            type="number" 
+                                            x-model="packageForm.width"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
+                                            placeholder="Ancho (cm)"
+                                            min="1"
+                                        />
+                                    </div>
+                                    <div>
+                                        <input 
+                                            type="number" 
+                                            x-model="packageForm.height"
+                                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
+                                            placeholder="Alto (cm)"
+                                            min="1"
+                                        />
                                     </div>
                                 </div>
                             </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Descripción del Contenido</label>
+                                <textarea 
+                                    x-model="packageForm.description"
+                                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
+                                    placeholder="Describa el contenido del paquete"
+                                    rows="2"
+                                ></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Origen</label>
+                                <select 
+                                    x-model="packageForm.origin"
+                                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
+                                >
+                                    <option value="">Seleccionar ciudad</option>
+                                    <option>Pando</option>
+                                    <option>Beni</option>
+                                    <option>Santa Cruz</option>
+                                    <option>Cochabamba</option>
+                                    <option>La Paz</option>
+                                    <option>Oruro</option>
+                                    <option>Potosi</option>
+                                    <option>Chuquisaca</option>
+                                    <option>Tarija</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Destino</label>
+                                <select 
+                                    x-model="packageForm.destination"
+                                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
+                                >
+                                    <option value="">Seleccionar ciudad</option>
+                                    <option>Pando</option>
+                                    <option>Beni</option>
+                                    <option>Santa Cruz</option>
+                                    <option>Cochabamba</option>
+                                    <option>La Paz</option>
+                                    <option>Oruro</option>
+                                    <option>Potosi</option>
+                                    <option>Chuquisaca</option>
+                                    <option>Tarija</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Datos del Destinatario</label>
+                                <input 
+                                    type="text" 
+                                    x-model="packageForm.recipientName"
+                                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995] mb-2"
+                                    placeholder="Nombre completo"
+                                />
+                                <input 
+                                    type="text" 
+                                    x-model="packageForm.recipientPhone"
+                                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995] mb-2"
+                                    placeholder="Teléfono"
+                                />
+                                <input 
+                                    type="email" 
+                                    x-model="packageForm.recipientEmail"
+                                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
+                                    placeholder="Correo electrónico"
+                                />
+                            </div>
+                            
+                            <button 
+                                @click="calculateShipping"
+                                class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center"
+                            >
+                                <span class="mr-2">Calcular Envío</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Resumen y QR -->
+                    <div x-show="showShippingSummary" class="bg-gray-700 rounded-xl p-6">
+                        <h2 class="text-lg font-medium text-white mb-4">Resumen del Envío</h2>
+                        
+                        <div class="space-y-4">
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">Tipo de Paquete:</span>
+                                <span class="text-white font-medium" x-text="getPackageTypeName(packageForm.type)"></span>
+                            </div>
+                            
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">Peso:</span>
+                                <span class="text-white font-medium" x-text="packageForm.weight + ' kg'"></span>
+                            </div>
+                            
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">Dimensiones:</span>
+                                <span class="text-white font-medium" x-text="packageForm.length + '×' + packageForm.width + '×' + packageForm.height + ' cm'"></span>
+                            </div>
+                            
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">Origen:</span>
+                                <span class="text-white font-medium" x-text="packageForm.origin"></span>
+                            </div>
+                            
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">Destino:</span>
+                                <span class="text-white font-medium" x-text="packageForm.destination"></span>
+                            </div>
+                            
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">Destinatario:</span>
+                                <span class="text-white font-medium" x-text="packageForm.recipientName"></span>
+                            </div>
+                            
+                            <div class="border-t border-gray-600 my-4 pt-4">
+                                <div class="flex justify-between text-lg">
+                                    <span class="text-gray-300">Costo de Envío:</span>
+                                    <span class="text-white font-bold" x-text="'$' + shippingCost.toFixed(2)"></span>
+                                </div>
+                                
+                                <div class="flex justify-between text-sm mt-2">
+                                    <span class="text-gray-300">Tiempo estimado:</span>
+                                    <span class="text-white" x-text="estimatedDeliveryTime"></span>
+                                </div>
+                            </div>
+                            
+                            <!-- QR de seguimiento -->
+                            <div class="mt-6 flex flex-col items-center">
+                                <h3 class="text-md font-medium text-white mb-2">Código de Seguimiento</h3>
+                                <div class="bg-white p-2 rounded-lg mb-2">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=TRACK12345678" alt="QR Code" class="w-32 h-32" />
+                                </div>
+                                <p class="text-sm text-gray-300">TRACK12345678</p>
+                                <p class="text-xs text-gray-400 mt-1">Escanea para seguimiento en tiempo real</p>
+                            </div>
+                            
+                            <!-- Estado del envío -->
+                            <div class="mt-4">
+                                <h3 class="text-md font-medium text-white mb-2">Estado del Envío</h3>
+                                <div class="relative">
+                                    <div class="absolute inset-0 flex items-center">
+                                        <div class="h-0.5 w-full bg-gray-600"></div>
+                                    </div>
+                                    <div class="relative flex justify-between">
+                                        <div>
+                                            <div class="h-4 w-4 rounded-full bg-[#037995] flex items-center justify-center"></div>
+                                            <div class="text-xs text-gray-400 mt-1">Registrado</div>
+                                        </div>
+                                        <div>
+                                            <div class="h-4 w-4 rounded-full bg-gray-600 flex items-center justify-center"></div>
+                                            <div class="text-xs text-gray-400 mt-1">En proceso</div>
+                                        </div>
+                                        <div>
+                                            <div class="h-4 w-4 rounded-full bg-gray-600 flex items-center justify-center"></div>
+                                            <div class="text-xs text-gray-400 mt-1">En tránsito</div>
+                                        </div>
+                                        <div>
+                                            <div class="h-4 w-4 rounded-full bg-gray-600 flex items-center justify-center"></div>
+                                            <div class="text-xs text-gray-400 mt-1">Entregado</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button 
+                                @click="proceedToPayment('shipping')"
+                                class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center mt-6"
+                            >
+                                <span class="mr-2">Proceder al Pago</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    
+
+    
+</script>
+
+
 
             <!-- Compra de Boletos -->
             <div x-show="activeTab === 'tickets'" class="py-6">
@@ -1288,24 +1320,24 @@
                 }
             ],
 
-            // Formulario de envío de paquetes
-            packageForm: {
-                type: 'small',
-                weight: 1,
-                length: 20,
-                width: 15,
-                height: 10,
-                value: 100,
-                description: '',
-                origin: '',
-                destination: '',
-                recipientName: '',
-                recipientPhone: '',
-                recipientEmail: ''
-            },
-            showShippingSummary: false,
-            shippingCost: 0,
-            estimatedDeliveryTime: '',
+           // Formulario de envío de paquetes
+    packageForm: {
+        type: 'small',
+        weight: 1,
+        length: 20,
+        width: 15,
+        height: 10,
+        value: 100,
+        description: '',
+        origin: '',
+        destination: '',
+        recipientName: '',
+        recipientPhone: '',
+        recipientEmail: ''
+    },
+    showShippingSummary: false,
+    shippingCost: 0,
+    estimatedDeliveryTime: '',
 
             // Formulario de compra de boletos
             ticketForm: {
@@ -1371,15 +1403,15 @@
             },
 
             calculateShipping() {
-                // Simulación de cálculo de envío
-                const baseRate = 100;
-                const weightRate = this.packageForm.weight * 10;
-                const volumeRate = (this.packageForm.length * this.packageForm.width * this.packageForm.height) / 1000 * 5;
-
-                this.shippingCost = baseRate + weightRate + volumeRate;
-                this.estimatedDeliveryTime = '1-2 días hábiles';
-                this.showShippingSummary = true;
-            },
+            // Simulación de cálculo de envío con tarifas actualizadas
+            const baseRate = 3;  // Tarifa base en Bs
+            const weightRate = this.packageForm.weight * 2; // Costo adicional por peso (peso * 2 Bs)
+            const volumeRate = (this.packageForm.length * this.packageForm.width * this.packageForm.height) / 1000 * 1; // Costo adicional por volumen
+            
+            this.shippingCost = baseRate + weightRate + volumeRate;
+            this.estimatedDeliveryTime = '1-2 días hábiles';
+            this.showShippingSummary = true;
+        },
 
             getPackageTypeName(type) {
                 const types = {
