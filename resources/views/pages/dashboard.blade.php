@@ -1,7 +1,8 @@
 @extends('layout.layoutDashboard')
 
 @section('content')
-<div x-data="transportApp()">
+<div x-data="transportApp2()"
+    x-init="getActivities()">
     <main class="flex-grow">
         <!-- Dashboard Home -->
         <div class="py-6">
@@ -107,8 +108,13 @@
         window.location.href = '/shipping';
     }
 
-    function transportApp() {
+    function getActivities() {
+        console.log('I am called automatically')
+    }
+
+    function transportApp2() {
         return {
+
             // Estado general
             currentScreen: 'dashboard',
             activeTab: 'dashboard',
@@ -130,25 +136,56 @@
             },
 
             // Actividades recientes
-            recentActivities: [{
-                    title: 'Boleto reservado',
-                    description: 'Ciudad de México a Guadalajara - 28/03/2023',
-                    status: 'Confirmado',
-                    statusClass: 'bg-green-100 text-green-800'
-                },
-                {
-                    title: 'Paquete enviado',
-                    description: 'Envío #12345 - En tránsito',
-                    status: 'En progreso',
-                    statusClass: 'bg-yellow-100 text-yellow-800'
-                },
-                {
-                    title: 'Boleto cancelado',
-                    description: 'Monterrey a Tijuana - 15/03/2023',
-                    status: 'Cancelado',
-                    statusClass: 'bg-red-100 text-red-800'
-                }
-            ],
+            recentActivities: async () => {
+                const response = await fetch('/actividad/buscar?userId=1}');
+                const data = (await response.json()) ?? [];
+
+                const mapData = data.map(activity => {
+                    let statusClass = 'bg-gray-100 text-gray-800';
+
+                    const types = {
+                        "boleto": "Boleto reservado",
+                    }
+
+                    const descripcion = activity.activityType === 'boleto' ? `Viaje de ${activity.boleto.viaje.ruta.origen} a ${activity.boleto.viaje.ruta.destino} - ${activity.boleto.fecha_viaje} | Asiento #${activity.boleto.nro_asiento}` : activity.activityType === 'paquete' ? `Envío #${activity.paquete.id} - ${activity.paquete.estado}` : `Viaje de ${activity.viaje.ruta.origen} a ${activity.viaje.ruta.destino} - ${activity.fecha_salida}`;
+
+                    if (activity.boleto.estado === 'Utilizado') {
+                        statusClass = 'bg-green-100 text-green-800';
+                    }
+
+                    return {
+                        title: types[activity.activityType],
+                        description: descripcion,
+                        status: activity.activityType === 'boleto' ? activity.boleto.estado : activity.activityType === 'paquete' ? activity.paquete.estado : activity.estado,
+                        statusClass: statusClass,
+                        date: activity.created_at
+                    };
+                });
+
+                return mapData.concat([{
+                        title: 'Boleto reservado',
+                        description: 'Ciudad de México a Guadalajara - 28/03/2023',
+                        status: 'Confirmado',
+                        statusClass: 'bg-green-100 text-green-800',
+                        date: '2025-03-15T12:00:00'
+                    },
+                    {
+                        title: 'Paquete enviado',
+                        description: 'Envío #12345 - En tránsito',
+                        status: 'En progreso',
+                        statusClass: 'bg-yellow-100 text-yellow-800',
+                        date: '2023-03-16T08:30:00'
+                    },
+                    {
+                        title: 'Boleto cancelado',
+                        description: 'Monterrey a Tijuana - 15/03/2023',
+                        status: 'Cancelado',
+                        statusClass: 'bg-red-100 text-red-800',
+                        date: '2023-03-14T16:45:00'
+                    }
+                ]).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            },
 
             // Formulario de envío de paquetes
             packageForm: {

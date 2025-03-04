@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActividadController;
 use App\Http\Controllers\BoletoController;
 use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\RutaController;
@@ -33,4 +34,5 @@ Route::get('/tickets', function () {
 Route::get('/boletos/buscar', [BoletoController::class, 'buscar'])->name('boletos.buscar');
 Route::get('/rutas/buscar', [RutaController::class, 'buscar'])->name('rutas.buscar');
 Route::get('/viajes/buscar', [ViajeController::class, 'buscar'])->name('viajes.buscar');
+Route::get('/actividad/buscar', [ActividadController::class, 'buscar'])->name('actividad.buscar');
 Route::resource('facturas', FacturaController::class);

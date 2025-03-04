@@ -12,8 +12,7 @@ class Boleto extends Model
     protected $table = 'boleto';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'vehiculo_id',
-        'ruta_id',
+        'viaje_id',
         'nro_asiento',
         'codigo_qr',
         'fecha_viaje',
@@ -21,15 +20,11 @@ class Boleto extends Model
         'precio'
     ];
 
-    public function vehiculo()
+    public function viaje()
     {
-        return $this->belongsTo(Vehiculo::class);
+        return $this->belongsTo(related: Viaje::class);
     }
 
-    public function ruta()
-    {
-        return $this->belongsTo(Ruta::class);
-    }
 
     public function detalleCompra()
     {
