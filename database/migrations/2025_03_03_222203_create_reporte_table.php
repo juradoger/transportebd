@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class CreateReporteTable extends Migration
@@ -12,7 +13,7 @@ class CreateReporteTable extends Migration
             $table->id();
             $table->string('titulo', 255);
             $table->text('descripcion')->nullable();
-            $table->date('fecha_creacion')->default(DB::raw('CURRENT_DATE'));
+            $table->date('fecha_creacion')->default(DB::raw('(CURRENT_DATE)'));
             $table->unsignedBigInteger('usuario_id');
             $table->foreign('usuario_id')->references('id')->on('usuario')->onDelete('cascade');
             $table->timestamps();
