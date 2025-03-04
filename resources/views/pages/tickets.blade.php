@@ -43,6 +43,7 @@
                                             <option>Puebla</option>
                                             <option>Tijuana</option>
                                             <option>Bermejo</option>
+                                            <option>Yacuiba</option>
                                         </select>
                                     </div>
 
@@ -211,7 +212,7 @@
                                         <div class="w-full h-full p-4 flex">
                                             <!-- Asientos lado izquierdo -->
                                             <div class="w-1/2 grid grid-cols-2 gap-2">
-                                                <template x-for="seat in seats.slice(0, 20)" :key="seat.id">
+                                                <template x-for="seat in seats.slice(0, seats.length / 2)" :key="seat.id">
                                                     <div
                                                         :class="[
                                     'seat',
@@ -232,7 +233,7 @@
 
                                             <!-- Asientos lado derecho -->
                                             <div class="w-1/2 grid grid-cols-2 gap-2">
-                                                <template x-for="seat in seats.slice(20, 40)" :key="seat.id">
+                                                <template x-for="seat in seats.slice(seats.length / 2, seats.length)" :key="seat.id">
                                                     <div
                                                         :class="[
                                     'seat',
@@ -668,11 +669,11 @@
                                 <div class="bg-gray-700 rounded-lg p-6 max-w-md mx-auto mb-6">
                                     <h3 class="text-lg font-medium text-white mb-4">Código de Confirmación</h3>
 
-                                    <div class="bg-white p-2 rounded-lg mb-2 mx-auto w-40 h-40">
-                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=TICKET12345678" alt="QR Code" class="w-full h-full" />
+                                    <div class="bg-white p-2 rounded-lg mb-2 mx-auto w-40 h-40" id="ticketQr">
+
                                     </div>
 
-                                    <p class="text-lg font-bold text-[#037995] mb-4">TICKET12345678</p>
+                                    <p id="identifier" class="text-lg font-bold text-[#037995] mb-4">TICKET12345678</p>
 
                                     <div class="text-left space-y-2">
                                         <div class="flex justify-between">
@@ -706,7 +707,8 @@
                                             <polyline points="7 10 12 15 17 10"></polyline>
                                             <line x1="12" y1="15" x2="12" y2="3"></line>
                                         </svg>
-                                        Descargar Boleto
+
+                                        Descargar Factura
                                     </button>
 
                                     <button
@@ -746,31 +748,6 @@
             // Estado general
             currentScreen: 'dashboard',
             activeTab: 'tickets',
-            mobileMenuOpen: false,
-            profileDropdown: false,
-
-            // Formularios de login y registro
-            showRegister: false,
-
-            recentActivities: [{
-                    title: 'Boleto reservado',
-                    description: 'Ciudad de México a Guadalajara - 28/03/2023',
-                    status: 'Confirmado',
-                    statusClass: 'bg-green-100 text-green-800'
-                },
-                {
-                    title: 'Paquete enviado',
-                    description: 'Envío #12345 - En tránsito',
-                    status: 'En progreso',
-                    statusClass: 'bg-yellow-100 text-yellow-800'
-                },
-                {
-                    title: 'Boleto cancelado',
-                    description: 'Monterrey a Tijuana - 15/03/2023',
-                    status: 'Cancelado',
-                    statusClass: 'bg-red-100 text-red-800'
-                }
-            ],
 
             // Formulario de envío de paquetes
             packageForm: {
@@ -798,11 +775,17 @@
                 date: '',
                 passengers: 1
             },
+            ticketQr: '',
             ticketStep: 'search',
             availableRoutes: [],
             selectedRoute: {},
             seats: [],
             selectedSeats: [],
+
+
+            updateTicketQr(qrCode) {
+                this.ticketQr = qrCode;
+            },
 
             // Pago
             paymentVisible: false,
@@ -834,6 +817,7 @@
                 reference: '',
                 terms: false
             },
+            urlTicket: '',
 
             // Métodos
             login() {
@@ -878,41 +862,9 @@
             },
 
             async searchRoutes() {
-                // Simulación de búsqueda de rutas
-
-
-
-                /* this.availableRoutes = [{
-                        time: '08:00 AM',
-                        duration: '5h 30m',
-                        type: 'Directo',
-                        seats: 45,
-                        price: 850,
-                        class: 'Ejecutivo'
-                    },
-                    {
-                        time: '12:30 PM',
-                        duration: '5h 45m',
-                        type: 'Directo',
-                        seats: 32,
-                        price: 780,
-                        class: 'Estándar'
-                    },
-                    {
-                        time: '16:00 PM',
-                        duration: '6h 00m',
-                        type: 'Con escala',
-                        seats: 18,
-                        price: 650,
-                        class: 'Económico'
-                    }
-                ]; */
-
-                // fetch to /boletos/buscar GET  send ticketForm search params
-
                 const searchParams = new URLSearchParams(this.ticketForm)
 
-                const response = await fetch('/rutas/buscar?' + searchParams.toString(), {
+                const response = await fetch('/viajes/buscar?' + searchParams.toString(), {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -922,45 +874,47 @@
 
                 const availableRoutes = (await response.json()) ?? [];
 
-                this.availableRoutes = availableRoutes.map(route => ({
-                    time: route.horario,
-                    duration: route.duracion,
+                this.availableRoutes = availableRoutes.map(viaje => ({
+                    time: viaje.fecha_salida,
+                    duration: viaje.ruta.duracion,
                     type: 'Directo',
-                    seats: route.asientos_disponibles,
-                    price: route.precio,
-                    class: route.clase
+                    seats: viaje.total_asientos_disponibles ?? 0,
+                    price: viaje.precio,
+                    class: viaje.ruta.clase,
+                    viaje: viaje
                 }));
 
                 this.ticketStep = 'results';
             },
 
             selectRoute(route) {
+                console.log("🚀 ~ selectRoute ~ route:", route)
                 this.selectedRoute = route;
-                this.generateSeats();
+                this.generateSeats(route.viaje);
                 this.ticketStep = 'seats';
             },
 
-            generateSeats() {
+            generateSeats(viaje) {
                 this.seats = [];
                 this.selectedSeats = [];
 
-                // Generar 40 asientos con estados aleatorios
-                for (let i = 1; i <= 40; i++) {
-                    const random = Math.random();
-                    let status = 'available';
+                const asientosDisponibles = viaje.asientos_disponibles
 
-                    // 30% de probabilidad de que el asiento esté ocupado
-                    if (random < 0.3) {
-                        status = 'occupied';
-                    }
+                // Generar asientos según la cantidad total
+                for (let i = 1; i <= viaje.total_asientos; i++) {
+                    const asiento = asientosDisponibles.find(asiento => asiento.nro_asiento === i);
+
+                    let status = asiento ? 'available' : 'occupied';
 
                     this.seats.push({
                         id: i,
-                        status: status
+                        status: status,
+                        boleto_id: asiento ? asiento.boleto_id : null
                     });
                 }
             },
             selectSeat(seat) {
+                console.log("🚀 ~ selectSeat ~ seat:", seat)
                 if (seat.status === 'occupied') return;
 
                 if (seat.status === 'selected') {
@@ -968,7 +922,7 @@
                     this.selectedSeats = this.selectedSeats.filter(id => id !== seat.id);
                 } else if (this.selectedSeats.length < this.ticketForm.passengers) {
                     seat.status = 'selected';
-                    this.selectedSeats.push(seat.id);
+                    this.selectedSeats.push(seat.boleto_id);
                 }
             },
 
@@ -991,6 +945,8 @@
                 } else {
                     this.paymentVisible = true;
                 }
+
+                return;
             },
 
             goBackFromPayment() {
@@ -1022,11 +978,51 @@
                 return true; // Para efectivo
             },
 
-            completePayment() {
+            async completePayment() {
                 // Simulación de procesamiento de pago
-                setTimeout(() => {
+                if (this.paymentType === 'tickets') {
+                    this.ticketStep = 'confirmation';
+
+                    const payload = {
+                        usuario_id: 1,
+                        boleto_ids: this.selectedSeats,
+                        metodo: 'Tarjeta'
+                    }
+
                     if (this.paymentType === 'tickets') {
-                        this.ticketStep = 'confirmation';
+                        try {
+                            const response = await fetch('/api/detalle-compra', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(payload)
+                            });
+
+                            if (!response.ok) throw new Error('Error al procesar el pago');
+
+                            const data = await response.json();
+                            this.updateTicketQr(data.qrCode);
+
+
+                            const qrImg = document.querySelector('#ticketQr');
+                            qrImg.innerHTML = data.qrCode;
+
+                            qrImg.querySelector('svg').setAttribute('width', '100%');
+                            qrImg.querySelector('svg').setAttribute('height', '100%');
+
+                            const identifier = document.querySelector('#identifier');
+                            identifier.innerText = data.identifier;
+
+                            this.urlTicket = data.identifier;
+
+                            this.ticketStep = 'confirmation';
+                        } catch (error) {
+
+                            console.error('Error al procesar el pago:', error);
+                            alert('Ocurrió un error al procesar el pago. Por favor intenta de nuevo.');
+                        }
+
                     } else {
                         this.paymentVisible = false;
                         this.showShippingSummary = false;
@@ -1053,11 +1049,14 @@
                         // Volver al dashboard
                         this.activeTab = 'dashboard';
                     }
-                }, 1500);
+                }
             },
 
             downloadTicket() {
-                alert('Boleto descargado correctamente.');
+                const url = `http://localhost:8000/facturas/${this.urlTicket}`;
+                window.open(url, '_blank');
+
+
             }
         };
     }

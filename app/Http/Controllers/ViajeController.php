@@ -55,35 +55,48 @@ class ViajeController extends Controller
     {
         $query = Viaje::with(['ruta', 'vehiculo']);
 
-        if ($request->has('origen')) {
+        if ($request->has('origin')) {
             $query->whereHas('ruta', function ($q) use ($request) {
-                $q->where('origen', $request->input('origen'));
+                $q->where('origen', $request->input('origin'));
             });
         }
 
-        if ($request->has('destino')) {
+        $destination = $request->input('destination');
+
+        if ($request->has('destination') && isset($destination)) {
             $query->whereHas('ruta', function ($q) use ($request) {
-                $q->where('destino', $request->input('destino'));
+                $q->where('destino', $request->input('destination'));
             });
         }
 
-        if ($request->has('fecha_viaje')) {
-            $query->whereDate('fecha_viaje', $request->input('fecha_viaje'));
+        $date = $request->input('date');
+        if ($request->has('date') && isset($date)) {
+            $query->whereDate('fecha_salida', $request->input('date'));
         }
 
         if ($request->has('pasajeros')) {
             $query->where('pasajeros', $request->input('pasajeros'));
         }
 
-        $boletos = $query->get()->map(function ($boleto) {
-            $vehiculo = $boleto->vehiculo;
-            $boletosUtilizados = Boleto::where('viaje_id', $boleto->viaje_id)
-                ->where('estado', 'Utilizado')
-                ->count();
-            $boleto->asientos_disponibles = $vehiculo->capacidad - $boletosUtilizados;
-            return $boleto;
+        $viajes = $query->get()->map(function ($viaje) {
+            $vehiculo = $viaje->vehiculo;
+            $boletosUtilizados = Boleto::where('viaje_id', $viaje->id)
+                ->where('estado', 'Utilizado');
+            $asientosDisponibles = Boleto::where('viaje_id', $viaje->id)
+                ->select('id as boleto_id', 'nro_asiento')
+                ->where('estado', 'Emitido')
+                ->get();
+
+            $countBoletosUtilizados = $boletosUtilizados->count();
+            $numerosBoletosUtilizados = $boletosUtilizados->pluck('nro_asiento');
+
+            $viaje->total_asientos_disponibles = $vehiculo->capacidad - $countBoletosUtilizados;
+            $viaje->total_asientos = $vehiculo->capacidad;
+            $viaje->numeros_asientos_utilizados = $numerosBoletosUtilizados;
+            $viaje->asientos_disponibles = $asientosDisponibles;
+            return $viaje;
         });
 
-        return response()->json($boletos);
+        return response()->json($viajes);
     }
 }
