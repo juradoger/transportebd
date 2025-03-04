@@ -1,261 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión de Transporte</title>
-    <!-- Tailwind CSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#037995',
-                        secondary: '#CE4B85',
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Alpine.js para interactividad -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
-        .grid-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: 50px 50px;
-            background-image:
-                linear-gradient(to right, rgba(3, 121, 149, 0.1) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(3, 121, 149, 0.1) 1px, transparent 1px);
-            transform: perspective(500px) rotateX(60deg);
-            transform-origin: center top;
-            opacity: 0.3;
-        }
+@extends('layout.defaults')
 
-        @keyframes pulse {
-            0% { opacity: 0.1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 0.1; }
-        }
-
-        .bg-pulse {
-            animation: pulse 4s infinite;
-        }
-
-        /* Estilos para los asientos */
-        .seat {
-            width: 2.5rem;
-            height: 2.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.25rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .seat-available {
-            background-color: #6B7280;
-        }
-
-        .seat-available:hover {
-            background-color: #4B5563;
-        }
-
-        .seat-selected {
-            background-color: #037995;
-            color: white;
-        }
-
-        .seat-occupied {
-            background-color: #1F2937;
-            cursor: not-allowed;
-        }
-    </style>
-</head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col" x-data="transportApp()">
-    <!-- Pantalla de Login -->
-    <div x-show="currentScreen === 'login'" class="min-h-screen flex flex-col bg-gray-900 relative overflow-hidden">
-        <!-- Fondo dinámico con líneas futuristas -->
-        <div class="absolute inset-0 z-0">
-            <div class="grid-background"></div>
-        </div>
-        
-        <!-- Efectos de luz -->
-        <div class="absolute top-1/4 -left-20 w-72 h-72 bg-[#037995] rounded-full filter blur-[100px] opacity-20 bg-pulse"></div>
-        <div class="absolute bottom-1/4 -right-20 w-72 h-72 bg-[#CE4B85] rounded-full filter blur-[100px] opacity-20 bg-pulse"></div>
-        
-        <!-- Contenido principal -->
-        <div class="container mx-auto px-4 py-8 flex-grow flex flex-col items-center justify-center relative z-10">
-            <!-- Logo -->
-            <div class="mb-6 flex justify-center">
-                <div class="w-24 h-24 rounded-full bg-gray-800 flex items-center justify-center border-2 border-[#037995]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-[#CE4B85]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                    </svg>
-                </div>
-            </div>
-            
-            <!-- Título -->
-            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white text-center mb-8">
-                 <span class="text-[#CE4B85]">Trans</span><span class="text-[#037995]">Tarija</span>
-            </h1>
-            
-            <!-- Formulario de inicio de sesión -->
-            <div class="w-full max-w-md bg-gray-800 bg-opacity-70 backdrop-blur-lg rounded-xl shadow-2xl p-8 border border-gray-700">
-                <div x-show="!showRegister">
-                    <h2 class="text-xl font-semibold text-white mb-6 text-center">Iniciar Sesión</h2>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-gray-300 text-sm font-medium mb-2">Correo Electrónico</label>
-                            <input 
-                                type="email" 
-                                x-model="loginForm.email"
-                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                placeholder="tu@email.com"
-                            />
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-300 text-sm font-medium mb-2">Contraseña</label>
-                            <input 
-                                type="password" 
-                                x-model="loginForm.password"
-                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                placeholder="••••••••"
-                            />
-                        </div>
-                        
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input id="remember-me" type="checkbox" class="h-4 w-4 text-[#037995] focus:ring-[#037995] border-gray-600 rounded">
-                                <label for="remember-me" class="ml-2 block text-sm text-gray-300">Recordarme</label>
-                            </div>
-                            
-                            <div class="text-sm">
-                                <a href="#" class="text-[#037995] hover:text-[#037995] hover:underline">¿Olvidaste tu contraseña?</a>
-                            </div>
-                        </div>
-                        
-                        <button 
-                            @click="login"
-                            class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center"
-                        >
-                            <span class="mr-2">Iniciar Sesión</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                                <polyline points="10 17 15 12 10 7"></polyline>
-                                <line x1="15" y1="12" x2="3" y2="12"></line>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <div class="mt-6 text-center">
-                        <p class="text-gray-400">
-                            ¿No tienes una cuenta? 
-                            <button @click="showRegister = true" class="text-[#037995] hover:underline font-medium">
-                                Registrarse
-                            </button>
-                        </p>
-                    </div>
-                </div>
-                
-                <!-- Formulario de registro -->
-                <div x-show="showRegister">
-                    <h2 class="text-xl font-semibold text-white mb-6 text-center">Crear Cuenta</h2>
-                    
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-gray-300 text-sm font-medium mb-2">Nombre</label>
-                                <input 
-                                    type="text" 
-                                    x-model="registerForm.firstName"
-                                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                    placeholder="Juan"
-                                />
-                            </div>
-                            <div>
-                                <label class="block text-gray-300 text-sm font-medium mb-2">Apellido</label>
-                                <input 
-                                    type="text" 
-                                    x-model="registerForm.lastName"
-                                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                    placeholder="Pérez"
-                                />
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-300 text-sm font-medium mb-2">Correo Electrónico</label>
-                            <input 
-                                type="email" 
-                                x-model="registerForm.email"
-                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                placeholder="tu@email.com"
-                            />
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-300 text-sm font-medium mb-2">Contraseña</label>
-                            <input 
-                                type="password" 
-                                x-model="registerForm.password"
-                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                placeholder="••••••••"
-                            />
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-300 text-sm font-medium mb-2">Confirmar Contraseña</label>
-                            <input 
-                                type="password" 
-                                x-model="registerForm.confirmPassword"
-                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                placeholder="••••••••"
-                            />
-                        </div>
-                        
-                        <button 
-                            @click="register"
-                            class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center"
-                        >
-                            <span class="mr-2">Registrarse</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="8.5" cy="7" r="4"></circle>
-                                <line x1="20" y1="8" x2="20" y2="14"></line>
-                                <line x1="23" y1="11" x2="17" y2="11"></line>
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <div class="mt-6 text-center">
-                        <p class="text-gray-400">
-                            ¿Ya tienes una cuenta? 
-                            <button @click="showRegister = false" class="text-[#037995] hover:underline font-medium">
-                                Iniciar Sesión
-                            </button>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Footer -->
-        <footer class="py-4 text-center text-gray-500 text-sm relative z-10">
-            &copy; <span x-text="new Date().getFullYear()"></span> Sistema de Gestión de Transporte. Todos los derechos reservados.
-        </footer>
-    </div>
-
+@section('content')
+<main x-data="transportApp()">
     <!-- Dashboard Principal -->
     <div x-show="currentScreen === 'dashboard'" class="min-h-screen bg-gray-900 flex flex-col">
         <!-- Barra de navegación -->
@@ -278,53 +24,49 @@
                             <span class="text-[#037995]">Trans</span><span class="text-[#CE4B85]">Port</span>
                         </div>
                     </div>
-                    
+
                     <!-- Enlaces de navegación -->
                     <div class="hidden md:block">
                         <div class="ml-10 flex items-center space-x-4">
-                            <button 
-                                @click="activeTab = 'dashboard'" 
-                                :class="activeTab === 'dashboard' 
-                                    ? 'bg-[#037995] text-white' 
+                            <button
+                                @click="activeTab = 'dashboard'"
+                                :class="activeTab === 'dashboard'
+                                    ? 'bg-[#037995] text-white'
                                     : 'text-gray-300 hover:bg-gray-700 hover:text-white'"
-                                class="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-                            >
+                                class="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                                 Inicio
                             </button>
-                            
-                            <button 
-                                @click="activeTab = 'shipping'" 
-                                :class="activeTab === 'shipping' 
-                                    ? 'bg-[#037995] text-white' 
+
+                            <button
+                                @click="activeTab = 'shipping'"
+                                :class="activeTab === 'shipping'
+                                    ? 'bg-[#037995] text-white'
                                     : 'text-gray-300 hover:bg-gray-700 hover:text-white'"
-                                class="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-                            >
+                                class="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                                 Envío de Paquetes
                             </button>
-                            
-                            <button 
-                                @click="activeTab = 'tickets'" 
-                                :class="activeTab === 'tickets' 
-                                    ? 'bg-[#037995] text-white' 
+
+                            <button
+                                @click="activeTab = 'tickets'"
+                                :class="activeTab === 'tickets'
+                                    ? 'bg-[#037995] text-white'
                                     : 'text-gray-300 hover:bg-gray-700 hover:text-white'"
-                                class="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-                            >
+                                class="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                                 Compra de Boletos
                             </button>
-                            
-                            <button 
-                                @click="activeTab = 'history'" 
-                                :class="activeTab === 'history' 
-                                    ? 'bg-[#037995] text-white' 
+
+                            <button
+                                @click="activeTab = 'history'"
+                                :class="activeTab === 'history'
+                                    ? 'bg-[#037995] text-white'
                                     : 'text-gray-300 hover:bg-gray-700 hover:text-white'"
-                                class="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-                            >
+                                class="px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                                 Reservas de boletos
                             </button>
-                            
+
                         </div>
                     </div>
-                    
+
                     <!-- Perfil de usuario -->
                     <div class="flex items-center">
                         <div class="ml-3 relative">
@@ -336,7 +78,7 @@
                                     </div>
                                 </button>
                             </div>
-                            
+
                             <!-- Menú desplegable de perfil -->
                             <div x-show="profileDropdown" @click.away="profileDropdown = false" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">Mi Perfil</a>
@@ -347,7 +89,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Botón de menú móvil -->
                     <div class="md:hidden flex items-center">
                         <button @click="mobileMenuOpen = !mobileMenuOpen" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
@@ -359,60 +101,56 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Menú móvil -->
             <div x-show="mobileMenuOpen" class="md:hidden">
                 <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                    <button 
-                        @click="activeTab = 'dashboard'; mobileMenuOpen = false" 
-                        :class="activeTab === 'dashboard' 
-                            ? 'bg-[#037995] text-white' 
+                    <button
+                        @click="activeTab = 'dashboard'; mobileMenuOpen = false"
+                        :class="activeTab === 'dashboard'
+                            ? 'bg-[#037995] text-white'
                             : 'text-gray-300 hover:bg-gray-700 hover:text-white'"
-                        class="block px-3 py-2 rounded-md text-base font-medium w-full text-left"
-                    >
+                        class="block px-3 py-2 rounded-md text-base font-medium w-full text-left">
                         Inicio
                     </button>
-                    
-                    <button 
-                        @click="activeTab = 'shipping'; mobileMenuOpen = false" 
-                        :class="activeTab === 'shipping' 
-                            ? 'bg-[#037995] text-white' 
+
+                    <button
+                        @click="activeTab = 'shipping'; mobileMenuOpen = false"
+                        :class="activeTab === 'shipping'
+                            ? 'bg-[#037995] text-white'
                             : 'text-gray-300 hover:bg-gray-700 hover:text-white'"
-                        class="block px-3 py-2 rounded-md text-base font-medium w-full text-left"
-                    >
+                        class="block px-3 py-2 rounded-md text-base font-medium w-full text-left">
                         Envío de Paquetes
                     </button>
-                    
-                    <button 
-                        @click="activeTab = 'tickets'; mobileMenuOpen = false" 
-                        :class="activeTab === 'tickets' 
-                            ? 'bg-[#037995] text-white' 
+
+                    <button
+                        @click="activeTab = 'tickets'; mobileMenuOpen = false"
+                        :class="activeTab === 'tickets'
+                            ? 'bg-[#037995] text-white'
                             : 'text-gray-300 hover:bg-gray-700 hover:text-white'"
-                        class="block px-3 py-2 rounded-md text-base font-medium w-full text-left"
-                    >
+                        class="block px-3 py-2 rounded-md text-base font-medium w-full text-left">
                         Compra de Boletos
                     </button>
-                    
-                    <button 
-                        @click="activeTab = 'history'; mobileMenuOpen = false" 
-                        :class="activeTab === 'history' 
-                            ? 'bg-[#037995] text-white' 
+
+                    <button
+                        @click="activeTab = 'history'; mobileMenuOpen = false"
+                        :class="activeTab === 'history'
+                            ? 'bg-[#037995] text-white'
                             : 'text-gray-300 hover:bg-gray-700 hover:text-white'"
-                        class="block px-3 py-2 rounded-md text-base font-medium w-full text-left"
-                    >
+                        class="block px-3 py-2 rounded-md text-base font-medium w-full text-left">
                         Mis Viajes
                     </button>
                 </div>
             </div>
         </nav>
-        
+
         <!-- Contenido principal -->
         <main class="flex-grow">
             <!-- Dashboard Home -->
             <div x-show="activeTab === 'dashboard'" class="py-6">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h1 class="text-2xl font-semibold text-white mb-6">Bienvenido, Juan</h1>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Tarjeta de Envío de Paquetes -->
                         <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700 hover:border-[#037995] transition-all duration-300 transform hover:-translate-y-1">
@@ -426,13 +164,12 @@
                                     </div>
                                     <h2 class="ml-4 text-xl font-semibold text-white">Envío de Paquetes</h2>
                                 </div>
-                                
+
                                 <p class="text-gray-300 mb-6">Envía paquetes a cualquier destino de manera rápida y segura. Seguimiento en tiempo real y notificaciones de estado.</p>
-                                
-                                <button 
-                                    @click="activeTab = 'shipping'" 
-                                    class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center"
-                                >
+
+                                <button
+                                    @click="activeTab = 'shipping'"
+                                    class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center">
                                     <span class="mr-2">Enviar un Paquete</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -441,7 +178,7 @@
                                 </button>
                             </div>
                         </div>
-                        
+
                         <!-- Tarjeta de Compra de Boletos -->
                         <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700 hover:border-[#037995] transition-all duration-300 transform hover:-translate-y-1">
                             <div class="p-6">
@@ -454,13 +191,12 @@
                                     </div>
                                     <h2 class="ml-4 text-xl font-semibold text-white">Compra de Boletos</h2>
                                 </div>
-                                
+
                                 <p class="text-gray-300 mb-6">Reserva tus boletos para viajar a cualquier destino. Selección de asientos, pago en línea y confirmación inmediata.</p>
-                                
-                                <button 
-                                    @click="activeTab = 'tickets'" 
-                                    class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center"
-                                >
+
+                                <button
+                                    @click="activeTab = 'tickets'"
+                                    class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center">
                                     <span class="mr-2">Comprar Boletos</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -470,7 +206,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Actividad reciente -->
                     <div class="mt-8">
                         <h2 class="text-lg font-medium text-white mb-4">Actividad Reciente</h2>
@@ -499,26 +235,25 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Envío de Paquetes -->
             <div x-show="activeTab === 'shipping'" class="py-6">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h1 class="text-2xl font-semibold text-white mb-6">Envío de Paquetes</h1>
-                    
+
                     <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700">
                         <div class="p-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <!-- Formulario de envío -->
                                 <div>
                                     <h2 class="text-lg font-medium text-white mb-4">Detalles del Paquete</h2>
-                                    
+
                                     <div class="space-y-4">
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-1">Tipo de Paquete</label>
-                                            <select 
+                                            <select
                                                 x-model="packageForm.type"
-                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                            >
+                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]">
                                                 <option value="document">Documento</option>
                                                 <option value="small">Paquete Pequeño</option>
                                                 <option value="medium">Paquete Mediano</option>
@@ -526,81 +261,74 @@
                                                 <option value="special">Carga Especial</option>
                                             </select>
                                         </div>
-                                        
+
                                         <div class="grid grid-cols-2 gap-4">
                                             <div>
                                                 <label class="block text-sm font-medium text-gray-300 mb-1">Peso (kg)</label>
-                                                <input 
-                                                    type="number" 
+                                                <input
+                                                    type="number"
                                                     x-model="packageForm.weight"
                                                     class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
                                                     placeholder="0.5"
                                                     step="0.1"
-                                                    min="0.1"
-                                                />
+                                                    min="0.1" />
                                             </div>
                                             <div>
                                                 <label class="block text-sm font-medium text-gray-300 mb-1">Valor Declarado ($)</label>
-                                                <input 
-                                                    type="number" 
+                                                <input
+                                                    type="number"
                                                     x-model="packageForm.value"
                                                     class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
                                                     placeholder="100"
                                                     step="1"
-                                                    min="0"
-                                                />
+                                                    min="0" />
                                             </div>
                                         </div>
-                                        
+
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-1">Dimensiones</label>
                                             <div class="grid grid-cols-3 gap-2">
                                                 <div>
-                                                    <input 
-                                                        type="number" 
+                                                    <input
+                                                        type="number"
                                                         x-model="packageForm.length"
                                                         class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
                                                         placeholder="Largo (cm)"
-                                                        min="1"
-                                                    />
+                                                        min="1" />
                                                 </div>
                                                 <div>
-                                                    <input 
-                                                        type="number" 
+                                                    <input
+                                                        type="number"
                                                         x-model="packageForm.width"
                                                         class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
                                                         placeholder="Ancho (cm)"
-                                                        min="1"
-                                                    />
+                                                        min="1" />
                                                 </div>
                                                 <div>
-                                                    <input 
-                                                        type="number" 
+                                                    <input
+                                                        type="number"
                                                         x-model="packageForm.height"
                                                         class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
                                                         placeholder="Alto (cm)"
-                                                        min="1"
-                                                    />
+                                                        min="1" />
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-1">Descripción del Contenido</label>
-                                            <textarea 
+                                            <textarea
                                                 x-model="packageForm.description"
                                                 class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
                                                 placeholder="Describa el contenido del paquete"
-                                                rows="2"
-                                            ></textarea>
+                                                rows="2"></textarea>
                                         </div>
-                                        
+
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-1">Origen</label>
-                                            <select 
+                                            <select
                                                 x-model="packageForm.origin"
-                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                            >
+                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]">
                                                 <option value="">Seleccionar ciudad</option>
                                                 <option>Ciudad de México</option>
                                                 <option>Guadalajara</option>
@@ -609,13 +337,12 @@
                                                 <option>Tijuana</option>
                                             </select>
                                         </div>
-                                        
+
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-1">Destino</label>
-                                            <select 
+                                            <select
                                                 x-model="packageForm.destination"
-                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                            >
+                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]">
                                                 <option value="">Seleccionar ciudad</option>
                                                 <option>Ciudad de México</option>
                                                 <option>Guadalajara</option>
@@ -624,33 +351,29 @@
                                                 <option>Tijuana</option>
                                             </select>
                                         </div>
-                                        
+
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-1">Datos del Destinatario</label>
-                                            <input 
-                                                type="text" 
+                                            <input
+                                                type="text"
                                                 x-model="packageForm.recipientName"
                                                 class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995] mb-2"
-                                                placeholder="Nombre completo"
-                                            />
-                                            <input 
-                                                type="text" 
+                                                placeholder="Nombre completo" />
+                                            <input
+                                                type="text"
                                                 x-model="packageForm.recipientPhone"
                                                 class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995] mb-2"
-                                                placeholder="Teléfono"
-                                            />
-                                            <input 
-                                                type="email" 
+                                                placeholder="Teléfono" />
+                                            <input
+                                                type="email"
                                                 x-model="packageForm.recipientEmail"
                                                 class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                                placeholder="Correo electrónico"
-                                            />
+                                                placeholder="Correo electrónico" />
                                         </div>
-                                        
-                                        <button 
+
+                                        <button
                                             @click="calculateShipping"
-                                            class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center"
-                                        >
+                                            class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center">
                                             <span class="mr-2">Calcular Envío</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -659,54 +382,54 @@
                                         </button>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Resumen y QR -->
                                 <div x-show="showShippingSummary" class="bg-gray-700 rounded-xl p-6">
                                     <h2 class="text-lg font-medium text-white mb-4">Resumen del Envío</h2>
-                                    
+
                                     <div class="space-y-4">
                                         <div class="flex justify-between">
                                             <span class="text-gray-300">Tipo de Paquete:</span>
                                             <span class="text-white font-medium" x-text="getPackageTypeName(packageForm.type)"></span>
                                         </div>
-                                        
+
                                         <div class="flex justify-between">
                                             <span class="text-gray-300">Peso:</span>
                                             <span class="text-white font-medium" x-text="packageForm.weight + ' kg'"></span>
                                         </div>
-                                        
+
                                         <div class="flex justify-between">
                                             <span class="text-gray-300">Dimensiones:</span>
                                             <span class="text-white font-medium" x-text="packageForm.length + '×' + packageForm.width + '×' + packageForm.height + ' cm'"></span>
                                         </div>
-                                        
+
                                         <div class="flex justify-between">
                                             <span class="text-gray-300">Origen:</span>
                                             <span class="text-white font-medium" x-text="packageForm.origin"></span>
                                         </div>
-                                        
+
                                         <div class="flex justify-between">
                                             <span class="text-gray-300">Destino:</span>
                                             <span class="text-white font-medium" x-text="packageForm.destination"></span>
                                         </div>
-                                        
+
                                         <div class="flex justify-between">
                                             <span class="text-gray-300">Destinatario:</span>
                                             <span class="text-white font-medium" x-text="packageForm.recipientName"></span>
                                         </div>
-                                        
+
                                         <div class="border-t border-gray-600 my-4 pt-4">
                                             <div class="flex justify-between text-lg">
                                                 <span class="text-gray-300">Costo de Envío:</span>
                                                 <span class="text-white font-bold" x-text="'$' + shippingCost.toFixed(2)"></span>
                                             </div>
-                                            
+
                                             <div class="flex justify-between text-sm mt-2">
                                                 <span class="text-gray-300">Tiempo estimado:</span>
                                                 <span class="text-white" x-text="estimatedDeliveryTime"></span>
                                             </div>
                                         </div>
-                                        
+
                                         <!-- QR de seguimiento -->
                                         <div class="mt-6 flex flex-col items-center">
                                             <h3 class="text-md font-medium text-white mb-2">Código de Seguimiento</h3>
@@ -716,7 +439,7 @@
                                             <p class="text-sm text-gray-300">TRACK12345678</p>
                                             <p class="text-xs text-gray-400 mt-1">Escanea para seguimiento en tiempo real</p>
                                         </div>
-                                        
+
                                         <!-- Estado del envío -->
                                         <div class="mt-4">
                                             <h3 class="text-md font-medium text-white mb-2">Estado del Envío</h3>
@@ -744,11 +467,10 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        
-                                        <button 
+
+                                        <button
                                             @click="proceedToPayment('shipping')"
-                                            class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center mt-6"
-                                        >
+                                            class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center mt-6">
                                             <span class="mr-2">Proceder al Pago</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
@@ -762,26 +484,25 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Compra de Boletos -->
             <div x-show="activeTab === 'tickets'" class="py-6">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h1 class="text-2xl font-semibold text-white mb-6">Compra de Boletos</h1>
-                    
+
                     <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-700">
                         <div class="p-6">
                             <!-- Búsqueda de rutas -->
                             <div x-show="ticketStep === 'search'">
                                 <h2 class="text-lg font-medium text-white mb-4">Buscar Rutas</h2>
-                                
+
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div class="space-y-4">
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-1">Origen</label>
-                                            <select 
+                                            <select
                                                 x-model="ticketForm.origin"
-                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                            >
+                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]">
                                                 <option value="">Seleccionar ciudad</option>
                                                 <option>Santa Cruz</option>
                                                 <option>La Paz</option>
@@ -790,13 +511,12 @@
                                                 <option>Cochabamba</option>
                                             </select>
                                         </div>
-                                        
+
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-1">Destino</label>
-                                            <select 
+                                            <select
                                                 x-model="ticketForm.destination"
-                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                            >
+                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]">
                                                 <option value="">Seleccionar ciudad</option>
                                                 <option>Ciudad de México</option>
                                                 <option>Guadalajara</option>
@@ -805,22 +525,20 @@
                                                 <option>Tijuana</option>
                                             </select>
                                         </div>
-                                        
+
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-1">Fecha de Viaje</label>
-                                            <input 
-                                                type="date" 
+                                            <input
+                                                type="date"
                                                 x-model="ticketForm.date"
-                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                            />
+                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]" />
                                         </div>
-                                        
+
                                         <div>
                                             <label class="block text-sm font-medium text-gray-300 mb-1">Pasajeros</label>
-                                            <select 
+                                            <select
                                                 x-model="ticketForm.passengers"
-                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                            >
+                                                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]">
                                                 <option>1</option>
                                                 <option>2</option>
                                                 <option>3</option>
@@ -828,11 +546,10 @@
                                                 <option>5</option>
                                             </select>
                                         </div>
-                                        
-                                        <button 
+
+                                        <button
                                             @click="searchRoutes"
-                                            class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center"
-                                        >
+                                            class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center">
                                             <span class="mr-2">Buscar Rutas</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <circle cx="11" cy="11" r="8"></circle>
@@ -840,38 +557,36 @@
                                             </svg>
                                         </button>
                                     </div>
-                                    
+
                                     <div class="hidden md:block">
                                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=BUSROUTES" alt="Bus Routes" class="w-full h-auto rounded-lg opacity-20" />
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Resultados de búsqueda -->
                             <div x-show="ticketStep === 'results'">
                                 <div class="flex items-center justify-between mb-4">
                                     <h2 class="text-lg font-medium text-white">Rutas Disponibles</h2>
-                                    <button 
+                                    <button
                                         @click="ticketStep = 'search'"
-                                        class="text-sm text-[#037995] hover:underline flex items-center"
-                                    >
+                                        class="text-sm text-[#037995] hover:underline flex items-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <polyline points="15 18 9 12 15 6"></polyline>
                                         </svg>
                                         Volver a la búsqueda
                                     </button>
                                 </div>
-                                
+
                                 <div class="text-white mb-4">
                                     <span class="font-medium" x-text="ticketForm.origin"></span> a <span class="font-medium" x-text="ticketForm.destination"></span> - <span x-text="formatDate(ticketForm.date)"></span>
                                 </div>
-                                
+
                                 <div class="space-y-4">
                                     <template x-for="(route, index) in availableRoutes" :key="index">
-                                        <div 
+                                        <div
                                             class="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-colors duration-200 cursor-pointer"
-                                            @click="selectRoute(route)"
-                                        >
+                                            @click="selectRoute(route)">
                                             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                                                 <div class="flex-1">
                                                     <div class="flex items-center">
@@ -887,7 +602,7 @@
                                                             <p class="text-sm text-gray-300" x-text="route.type"></p>
                                                         </div>
                                                     </div>
-                                                    
+
                                                     <div class="mt-4 grid grid-cols-3 gap-4">
                                                         <div>
                                                             <p class="text-sm text-gray-400">Duración</p>
@@ -903,7 +618,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div class="mt-4 md:mt-0 flex flex-col items-end">
                                                     <p class="text-2xl font-bold text-white" x-text="'$' + route.price"></p>
                                                     <p class="text-sm text-gray-400">por persona</p>
@@ -913,303 +628,297 @@
                                     </template>
                                 </div>
                             </div>
-                            
+
                             <!-- Reemplaza la sección de selección de asientos existente con este código mejorado -->
 
-<!-- Selección de asientos -->
-<div x-show="ticketStep === 'seats'" class="py-4">
-    <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-medium text-white">Selección de Asientos</h2>
-        <button 
-            @click="ticketStep = 'results'"
-            class="text-sm text-[#037995] hover:underline flex items-center"
-        >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-            Volver a las rutas
-        </button>
-    </div>
-    
-    <div class="text-white mb-4">
-        <div><span class="font-medium" x-text="ticketForm.origin"></span> a <span class="font-medium" x-text="ticketForm.destination"></span></div>
-        <div class="text-sm text-gray-300"><span x-text="formatDate(ticketForm.date)"></span> - <span x-text="selectedRoute.time"></span> - <span x-text="selectedRoute.duration"></span></div>
-    </div>
-    
-    <div class="flex flex-col md:flex-row gap-6">
-        <!-- Mapa de asientos (ahora más grande) -->
-        <div class="w-full md:w-1/2 bg-gray-700 rounded-lg p-4">
-            <h3 class="text-md font-medium text-white mb-4 text-center">Seleccione sus asientos</h3>
-            
-            <div class="flex justify-center mb-4">
-                <div class="flex flex-wrap justify-center gap-4">
-                    <div class="flex items-center">
-                        <div class="h-4 w-4 rounded-sm bg-gray-500 mr-2"></div>
-                        <span class="text-xs text-gray-300">Disponible</span>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="h-4 w-4 rounded-sm bg-[#037995] mr-2"></div>
-                        <span class="text-xs text-gray-300">Seleccionado</span>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="h-4 w-4 rounded-sm bg-gray-800 mr-2"></div>
-                        <span class="text-xs text-gray-300">Ocupado</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Autobús mejorado -->
-            <div class="relative mx-auto max-w-md border-2 border-gray-600 rounded-t-3xl bg-gray-800 mb-4">
-                <!-- Parte frontal del autobús -->
-                <div class="h-12 bg-gray-700 rounded-t-3xl flex items-center justify-center border-b border-gray-600">
-                    <div class="w-16 h-6 bg-gray-500 rounded-md"></div>
-                </div>
-                
-                <!-- Conductor -->
-                <div class="absolute top-3 left-4 w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                </div>
-                
-                <!-- Pasillo central -->
-                <div class="w-full h-full p-4 flex">
-                    <!-- Asientos lado izquierdo -->
-                    <div class="w-1/2 grid grid-cols-2 gap-2">
-                        <template x-for="seat in seats.slice(0, 20)" :key="seat.id">
-                            <div 
-                                :class="[
+                            <!-- Selección de asientos -->
+                            <div x-show="ticketStep === 'seats'" class="py-4">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h2 class="text-lg font-medium text-white">Selección de Asientos</h2>
+                                    <button
+                                        @click="ticketStep = 'results'"
+                                        class="text-sm text-[#037995] hover:underline flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="15 18 9 12 15 6"></polyline>
+                                        </svg>
+                                        Volver a las rutas
+                                    </button>
+                                </div>
+
+                                <div class="text-white mb-4">
+                                    <div><span class="font-medium" x-text="ticketForm.origin"></span> a <span class="font-medium" x-text="ticketForm.destination"></span></div>
+                                    <div class="text-sm text-gray-300"><span x-text="formatDate(ticketForm.date)"></span> - <span x-text="selectedRoute.time"></span> - <span x-text="selectedRoute.duration"></span></div>
+                                </div>
+
+                                <div class="flex flex-col md:flex-row gap-6">
+                                    <!-- Mapa de asientos (ahora más grande) -->
+                                    <div class="w-full md:w-1/2 bg-gray-700 rounded-lg p-4">
+                                        <h3 class="text-md font-medium text-white mb-4 text-center">Seleccione sus asientos</h3>
+
+                                        <div class="flex justify-center mb-4">
+                                            <div class="flex flex-wrap justify-center gap-4">
+                                                <div class="flex items-center">
+                                                    <div class="h-4 w-4 rounded-sm bg-gray-500 mr-2"></div>
+                                                    <span class="text-xs text-gray-300">Disponible</span>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <div class="h-4 w-4 rounded-sm bg-[#037995] mr-2"></div>
+                                                    <span class="text-xs text-gray-300">Seleccionado</span>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <div class="h-4 w-4 rounded-sm bg-gray-800 mr-2"></div>
+                                                    <span class="text-xs text-gray-300">Ocupado</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Autobús mejorado -->
+                                        <div class="relative mx-auto max-w-md border-2 border-gray-600 rounded-t-3xl bg-gray-800 mb-4">
+                                            <!-- Parte frontal del autobús -->
+                                            <div class="h-12 bg-gray-700 rounded-t-3xl flex items-center justify-center border-b border-gray-600">
+                                                <div class="w-16 h-6 bg-gray-500 rounded-md"></div>
+                                            </div>
+
+                                            <!-- Conductor -->
+                                            <div class="absolute top-3 left-4 w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                    <circle cx="12" cy="7" r="4"></circle>
+                                                </svg>
+                                            </div>
+
+                                            <!-- Pasillo central -->
+                                            <div class="w-full h-full p-4 flex">
+                                                <!-- Asientos lado izquierdo -->
+                                                <div class="w-1/2 grid grid-cols-2 gap-2">
+                                                    <template x-for="seat in seats.slice(0, 20)" :key="seat.id">
+                                                        <div
+                                                            :class="[
                                     'seat',
                                     seat.status === 'available' ? 'seat-available' : '',
                                     seat.status === 'selected' ? 'seat-selected' : '',
                                     seat.status === 'occupied' ? 'seat-occupied' : ''
                                 ]"
-                                @click="selectSeat(seat)"
-                                @mouseenter="seat.status !== 'occupied' && (hoveredSeat = seat)"
-                                @mouseleave="hoveredSeat = null"
-                            >
-                                <span x-text="seat.id"></span>
-                            </div>
-                        </template>
-                    </div>
-                    
-                    <!-- Pasillo (espacio) -->
-                    <div class="w-4 mx-1 bg-gray-700 rounded-md"></div>
-                    
-                    <!-- Asientos lado derecho -->
-                    <div class="w-1/2 grid grid-cols-2 gap-2">
-                        <template x-for="seat in seats.slice(20, 40)" :key="seat.id">
-                            <div 
-                                :class="[
+                                                            @click="selectSeat(seat)"
+                                                            @mouseenter="seat.status !== 'occupied' && (hoveredSeat = seat)"
+                                                            @mouseleave="hoveredSeat = null">
+                                                            <span x-text="seat.id"></span>
+                                                        </div>
+                                                    </template>
+                                                </div>
+
+                                                <!-- Pasillo (espacio) -->
+                                                <div class="w-4 mx-1 bg-gray-700 rounded-md"></div>
+
+                                                <!-- Asientos lado derecho -->
+                                                <div class="w-1/2 grid grid-cols-2 gap-2">
+                                                    <template x-for="seat in seats.slice(20, 40)" :key="seat.id">
+                                                        <div
+                                                            :class="[
                                     'seat',
                                     seat.status === 'available' ? 'seat-available' : '',
                                     seat.status === 'selected' ? 'seat-selected' : '',
                                     seat.status === 'occupied' ? 'seat-occupied' : ''
                                 ]"
-                                @click="selectSeat(seat)"
-                                @mouseenter="seat.status !== 'occupied' && (hoveredSeat = seat)"
-                                @mouseleave="hoveredSeat = null"
-                            >
-                                <span x-text="seat.id"></span>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-                
-                <!-- Parte trasera del autobús -->
-                <div class="h-6 bg-gray-700 border-t border-gray-600"></div>
-            </div>
-            
-            <div class="text-center text-sm text-gray-300 mt-4">
-                <p>Asientos seleccionados: <span x-text="selectedSeats.join(', ') || 'Ninguno'"></span></p>
-                <p class="text-xs text-gray-400 mt-1">Seleccione <span x-text="ticketForm.passengers"></span> asiento(s)</p>
-            </div>
-        </div>
-        
-        <!-- Detalles de asientos y resumen de compra -->
-        <div class="w-full md:w-1/2 flex flex-col gap-4">
-            <!-- Detalles de asientos seleccionados -->
-            <div class="bg-gray-700 rounded-lg p-4">
-                <h3 class="text-md font-medium text-white mb-4">Detalles de Asientos</h3>
-                
-                <div x-show="selectedSeats.length === 0" class="text-center py-6 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="6" width="20" height="12" rx="2" ry="2"></rect>
-                        <path d="M6 12h12"></path>
-                    </svg>
-                    <p>Seleccione asientos para ver sus detalles</p>
-                </div>
-                
-                <div x-show="selectedSeats.length > 0" class="space-y-4">
-                    <template x-for="(seatId, index) in selectedSeats" :key="seatId">
-                        <div class="bg-gray-800 rounded-lg p-3 border border-gray-600">
-                            <div class="flex items-center justify-between mb-2">
-                                <div class="flex items-center">
-                                    <div class="h-8 w-8 rounded-md bg-[#037995] flex items-center justify-center text-white font-bold mr-3">
-                                        <span x-text="seatId"></span>
+                                                            @click="selectSeat(seat)"
+                                                            @mouseenter="seat.status !== 'occupied' && (hoveredSeat = seat)"
+                                                            @mouseleave="hoveredSeat = null">
+                                                            <span x-text="seat.id"></span>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </div>
+
+                                            <!-- Parte trasera del autobús -->
+                                            <div class="h-6 bg-gray-700 border-t border-gray-600"></div>
+                                        </div>
+
+                                        <div class="text-center text-sm text-gray-300 mt-4">
+                                            <p>Asientos seleccionados: <span x-text="selectedSeats.join(', ') || 'Ninguno'"></span></p>
+                                            <p class="text-xs text-gray-400 mt-1">Seleccione <span x-text="ticketForm.passengers"></span> asiento(s)</p>
+                                        </div>
                                     </div>
-                                    <span class="text-white font-medium">Asiento <span x-text="seatId"></span></span>
-                                </div>
-                                <button 
-                                    @click="unselectSeat(seatId)" 
-                                    class="text-gray-400 hover:text-white"
-                                    title="Quitar selección"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <line x1="15" y1="9" x2="9" y2="15"></line>
-                                        <line x1="9" y1="9" x2="15" y2="15"></line>
-                                    </svg>
-                                </button>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 gap-2 text-sm">
-                                <div>
-                                    <span class="text-gray-400">Tipo:</span>
-                                    <span class="text-white" x-text="getSeatType(seatId)"></span>
-                                </div>
-                                <div>
-                                    <span class="text-gray-400">Ubicación:</span>
-                                    <span class="text-white" x-text="getSeatLocation(seatId)"></span>
-                                </div>
-                                <div>
-                                    <span class="text-gray-400">Pasajero:</span>
-                                    <span class="text-white" x-text="'Pasajero ' + (index + 1)"></span>
-                                </div>
-                                <div>
-                                    <span class="text-gray-400">Precio:</span>
-                                    <span class="text-white" x-text="'$' + selectedRoute.price"></span>
-                                </div>
-                            </div>
-                            
-                            <!-- Características del asiento -->
-                            <div class="mt-3 flex flex-wrap gap-2">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                                    </svg>
-                                    Reclinable
-                                </span>
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M5 12h14"></path>
-                                        <path d="M12 5v14"></path>
-                                    </svg>
-                                    USB
-                                </span>
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-                                        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-                                        <line x1="6" y1="1" x2="6" y2="4"></line>
-                                        <line x1="10" y1="1" x2="10" y2="4"></line>
-                                        <line x1="14" y1="1" x2="14" y2="4"></line>
-                                    </svg>
-                                    Aire
-                                </span>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-            </div>
-            
-            <!-- Resumen de compra -->
-            <div class="bg-gray-700 rounded-lg p-4">
-                <h3 class="text-md font-medium text-white mb-4">Resumen de Compra</h3>
-                
-                <div class="space-y-3">
-                    <div class="flex justify-between">
-                        <span class="text-gray-300">Ruta:</span>
-                        <span class="text-white" x-text="ticketForm.origin + ' - ' + ticketForm.destination"></span>
-                    </div>
-                    
-                    <div class="flex justify-between">
-                        <span class="text-gray-300">Fecha:</span>
-                        <span class="text-white" x-text="formatDate(ticketForm.date)"></span>
-                    </div>
-                    
-                    <div class="flex justify-between">
-                        <span class="text-gray-300">Hora:</span>
-                        <span class="text-white" x-text="selectedRoute.time"></span>
-                    </div>
-                    
-                    <div class="flex justify-between">
-                        <span class="text-gray-300">Clase:</span>
-                        <span class="text-white" x-text="selectedRoute.class"></span>
-                    </div>
-                    
-                    <div class="flex justify-between">
-                        <span class="text-gray-300">Asientos:</span>
-                        <span class="text-white" x-text="selectedSeats.join(', ') || 'Ninguno'"></span>
-                    </div>
-                    
-                    <div class="flex justify-between">
-                        <span class="text-gray-300">Pasajeros:</span>
-                        <span class="text-white" x-text="ticketForm.passengers"></span>
-                    </div>
-                    
-                    <div class="border-t border-gray-600 my-3 pt-3">
-                        <div class="flex justify-between">
-                            <span class="text-gray-300">Precio por boleto:</span>
-                            <span class="text-white" x-text="'$' + selectedRoute.price"></span>
-                        </div>
-                        
-                        <div class="flex justify-between mt-1">
-                            <span class="text-gray-300">Subtotal:</span>
-                            <span class="text-white" x-text="'$' + (selectedRoute.price * ticketForm.passengers).toFixed(2)"></span>
-                        </div>
-                        
-                        <div class="flex justify-between mt-1">
-                            <span class="text-gray-300">Impuestos:</span>
-                            <span class="text-white" x-text="'$' + (selectedRoute.price * ticketForm.passengers * 0.16).toFixed(2)"></span>
-                        </div>
-                        
-                        <div class="flex justify-between mt-3 text-lg font-bold">
-                            <span class="text-gray-300">Total:</span>
-                            <span class="text-white" x-text="'$' + (selectedRoute.price * ticketForm.passengers * 1.16).toFixed(2)"></span>
-                        </div>
-                    </div>
-                </div>
-                
-                <button 
-                    @click="proceedToPayment('tickets')"
-                    :disabled="selectedSeats.length < ticketForm.passengers"
-                    :class="[
+
+                                    <!-- Detalles de asientos y resumen de compra -->
+                                    <div class="w-full md:w-1/2 flex flex-col gap-4">
+                                        <!-- Detalles de asientos seleccionados -->
+                                        <div class="bg-gray-700 rounded-lg p-4">
+                                            <h3 class="text-md font-medium text-white mb-4">Detalles de Asientos</h3>
+
+                                            <div x-show="selectedSeats.length === 0" class="text-center py-6 text-gray-400">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-2 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <rect x="2" y="6" width="20" height="12" rx="2" ry="2"></rect>
+                                                    <path d="M6 12h12"></path>
+                                                </svg>
+                                                <p>Seleccione asientos para ver sus detalles</p>
+                                            </div>
+
+                                            <div x-show="selectedSeats.length > 0" class="space-y-4">
+                                                <template x-for="(seatId, index) in selectedSeats" :key="seatId">
+                                                    <div class="bg-gray-800 rounded-lg p-3 border border-gray-600">
+                                                        <div class="flex items-center justify-between mb-2">
+                                                            <div class="flex items-center">
+                                                                <div class="h-8 w-8 rounded-md bg-[#037995] flex items-center justify-center text-white font-bold mr-3">
+                                                                    <span x-text="seatId"></span>
+                                                                </div>
+                                                                <span class="text-white font-medium">Asiento <span x-text="seatId"></span></span>
+                                                            </div>
+                                                            <button
+                                                                @click="unselectSeat(seatId)"
+                                                                class="text-gray-400 hover:text-white"
+                                                                title="Quitar selección">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+
+                                                        <div class="grid grid-cols-2 gap-2 text-sm">
+                                                            <div>
+                                                                <span class="text-gray-400">Tipo:</span>
+                                                                <span class="text-white" x-text="getSeatType(seatId)"></span>
+                                                            </div>
+                                                            <div>
+                                                                <span class="text-gray-400">Ubicación:</span>
+                                                                <span class="text-white" x-text="getSeatLocation(seatId)"></span>
+                                                            </div>
+                                                            <div>
+                                                                <span class="text-gray-400">Pasajero:</span>
+                                                                <span class="text-white" x-text="'Pasajero ' + (index + 1)"></span>
+                                                            </div>
+                                                            <div>
+                                                                <span class="text-gray-400">Precio:</span>
+                                                                <span class="text-white" x-text="'$' + selectedRoute.price"></span>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Características del asiento -->
+                                                        <div class="mt-3 flex flex-wrap gap-2">
+                                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-300">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                                                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                                                                </svg>
+                                                                Reclinable
+                                                            </span>
+                                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-300">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <path d="M5 12h14"></path>
+                                                                    <path d="M12 5v14"></path>
+                                                                </svg>
+                                                                USB
+                                                            </span>
+                                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-300">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                                                                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+                                                                    <line x1="6" y1="1" x2="6" y2="4"></line>
+                                                                    <line x1="10" y1="1" x2="10" y2="4"></line>
+                                                                    <line x1="14" y1="1" x2="14" y2="4"></line>
+                                                                </svg>
+                                                                Aire
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+
+                                        <!-- Resumen de compra -->
+                                        <div class="bg-gray-700 rounded-lg p-4">
+                                            <h3 class="text-md font-medium text-white mb-4">Resumen de Compra</h3>
+
+                                            <div class="space-y-3">
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-300">Ruta:</span>
+                                                    <span class="text-white" x-text="ticketForm.origin + ' - ' + ticketForm.destination"></span>
+                                                </div>
+
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-300">Fecha:</span>
+                                                    <span class="text-white" x-text="formatDate(ticketForm.date)"></span>
+                                                </div>
+
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-300">Hora:</span>
+                                                    <span class="text-white" x-text="selectedRoute.time"></span>
+                                                </div>
+
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-300">Clase:</span>
+                                                    <span class="text-white" x-text="selectedRoute.class"></span>
+                                                </div>
+
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-300">Asientos:</span>
+                                                    <span class="text-white" x-text="selectedSeats.join(', ') || 'Ninguno'"></span>
+                                                </div>
+
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-300">Pasajeros:</span>
+                                                    <span class="text-white" x-text="ticketForm.passengers"></span>
+                                                </div>
+
+                                                <div class="border-t border-gray-600 my-3 pt-3">
+                                                    <div class="flex justify-between">
+                                                        <span class="text-gray-300">Precio por boleto:</span>
+                                                        <span class="text-white" x-text="'$' + selectedRoute.price"></span>
+                                                    </div>
+
+                                                    <div class="flex justify-between mt-1">
+                                                        <span class="text-gray-300">Subtotal:</span>
+                                                        <span class="text-white" x-text="'$' + (selectedRoute.price * ticketForm.passengers).toFixed(2)"></span>
+                                                    </div>
+
+                                                    <div class="flex justify-between mt-1">
+                                                        <span class="text-gray-300">Impuestos:</span>
+                                                        <span class="text-white" x-text="'$' + (selectedRoute.price * ticketForm.passengers * 0.16).toFixed(2)"></span>
+                                                    </div>
+
+                                                    <div class="flex justify-between mt-3 text-lg font-bold">
+                                                        <span class="text-gray-300">Total:</span>
+                                                        <span class="text-white" x-text="'$' + (selectedRoute.price * ticketForm.passengers * 1.16).toFixed(2)"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                @click="proceedToPayment('tickets')"
+                                                :disabled="selectedSeats.length < ticketForm.passengers"
+                                                :class="[
                         'w-full py-3 px-4 text-white font-medium rounded-lg shadow-lg transition-all duration-300 flex items-center justify-center mt-6',
                         selectedSeats.length < ticketForm.passengers ? 'bg-gray-500 cursor-not-allowed' : 'bg-[#037995] hover:bg-[#026980]'
-                    ]"
-                >
-                    <span class="mr-2">Proceder al Pago</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                        <line x1="1" y1="10" x2="23" y2="10"></line>
-                    </svg>
-                </button>
-                
-                <div x-show="selectedSeats.length < ticketForm.passengers" class="text-sm text-red-400 text-center mt-2">
-                    Por favor seleccione <span x-text="ticketForm.passengers"></span> asiento(s)
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                    ]">
+                                                <span class="mr-2">Proceder al Pago</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                                                </svg>
+                                            </button>
+
+                                            <div x-show="selectedSeats.length < ticketForm.passengers" class="text-sm text-red-400 text-center mt-2">
+                                                Por favor seleccione <span x-text="ticketForm.passengers"></span> asiento(s)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <!-- Interfaz de pago -->
                             <div x-show="ticketStep === 'payment' || paymentVisible">
                                 <div class="flex items-center justify-between mb-4">
                                     <h2 class="text-lg font-medium text-white">Método de Pago</h2>
-                                    <button 
+                                    <button
                                         @click="goBackFromPayment"
-                                        class="text-sm text-[#037995] hover:underline flex items-center"
-                                    >
+                                        class="text-sm text-[#037995] hover:underline flex items-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <polyline points="15 18 9 12 15 6"></polyline>
                                         </svg>
                                         Volver
                                     </button>
                                 </div>
-                                
+
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <!-- Formulario de pago -->
                                     <div>
@@ -1217,13 +926,12 @@
                                             <label class="block text-sm font-medium text-gray-300 mb-1">Método de Pago</label>
                                             <div class="grid grid-cols-4 gap-2">
                                                 <template x-for="method in paymentMethods" :key="method.id">
-                                                    <div 
+                                                    <div
                                                         :class="[
                                                             'border rounded-lg p-2 flex flex-col items-center justify-center cursor-pointer transition-all duration-200',
                                                             paymentForm.method === method.id ? 'border-[#037995] bg-gray-700' : 'border-gray-600 bg-gray-800 hover:bg-gray-700'
                                                         ]"
-                                                        @click="paymentForm.method = method.id"
-                                                    >
+                                                        @click="paymentForm.method = method.id">
                                                         <div class="h-8 w-8 flex items-center justify-center mb-1">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                                 <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
@@ -1235,71 +943,66 @@
                                                 </template>
                                             </div>
                                         </div>
-                                        
+
                                         <!-- Tarjeta de crédito/débito -->
                                         <div x-show="paymentForm.method === 'card'" class="space-y-4">
                                             <div>
                                                 <label class="block text-sm font-medium text-gray-300 mb-1">Número de Tarjeta</label>
-                                                <input 
-                                                    type="text" 
+                                                <input
+                                                    type="text"
                                                     x-model="paymentForm.cardNumber"
                                                     class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
                                                     placeholder="1234 5678 9012 3456"
-                                                    maxlength="19"
-                                                />
+                                                    maxlength="19" />
                                             </div>
-                                            
+
                                             <div class="grid grid-cols-2 gap-4">
                                                 <div>
                                                     <label class="block text-sm font-medium text-gray-300 mb-1">Fecha de Expiración</label>
-                                                    <input 
-                                                        type="text" 
+                                                    <input
+                                                        type="text"
                                                         x-model="paymentForm.expiry"
                                                         class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
                                                         placeholder="MM/AA"
-                                                        maxlength="5"
-                                                    />
+                                                        maxlength="5" />
                                                 </div>
                                                 <div>
                                                     <label class="block text-sm font-medium text-gray-300 mb-1">CVV</label>
-                                                    <input 
-                                                        type="text" 
+                                                    <input
+                                                        type="text"
                                                         x-model="paymentForm.cvv"
                                                         class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
                                                         placeholder="123"
-                                                        maxlength="3"
-                                                    />
+                                                        maxlength="3" />
                                                 </div>
                                             </div>
-                                            
+
                                             <div>
                                                 <label class="block text-sm font-medium text-gray-300 mb-1">Nombre en la Tarjeta</label>
-                                                <input 
-                                                    type="text" 
+                                                <input
+                                                    type="text"
                                                     x-model="paymentForm.cardName"
                                                     class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                                    placeholder="JUAN PEREZ"
-                                                />
+                                                    placeholder="JUAN PEREZ" />
                                             </div>
                                         </div>
-                                        
+
                                         <!-- PayPal -->
                                         <div x-show="paymentForm.method === 'paypal'" class="space-y-4">
                                             <div>
                                                 <label class="block text-sm font-medium text-gray-300 mb-1">Correo Electrónico de PayPal</label>
-                                                <input 
-                                                    type="email" 
+                                                <input
+                                                    type="email"
                                                     x-model="paymentForm.paypalEmail"
                                                     class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                                    placeholder="correo@ejemplo.com"
-                                                />
+                                                    placeholder="correo@ejemplo.com" />
                                             </div>
-                                            
+
                                             <p class="text-sm text-gray-400">
                                                 Serás redirigido a PayPal para completar el pago de manera segura.
                                             </p>
                                         </div>
-                                        
+
                                         <!-- Transferencia -->
                                         <div x-show="paymentForm.method === 'transfer'" class="space-y-4">
                                             <div class="bg-gray-700 p-4 rounded-lg">
@@ -1309,18 +1012,17 @@
                                                 <p class="text-sm text-gray-300">CLABE: 012 345 678 901 234 567</p>
                                                 <p class="text-sm text-gray-300">Beneficiario: TransPort S.A. de C.V.</p>
                                             </div>
-                                            
+
                                             <div>
                                                 <label class="block text-sm font-medium text-gray-300 mb-1">Referencia de Pago</label>
-                                                <input 
-                                                    type="text" 
+                                                <input
+                                                    type="text"
                                                     x-model="paymentForm.reference"
                                                     class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                                    placeholder="Referencia de tu transferencia"
-                                                />
+                                                    placeholder="Referencia de tu transferencia" />
                                             </div>
                                         </div>
-                                        
+
                                         <!-- Efectivo -->
                                         <div x-show="paymentForm.method === 'cash'" class="space-y-4">
                                             <div class="bg-gray-700 p-4 rounded-lg">
@@ -1333,7 +1035,7 @@
                                                 </p>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="mt-6">
                                             <label class="flex items-center">
                                                 <input type="checkbox" x-model="paymentForm.terms" class="h-4 w-4 text-[#037995] focus:ring-[#037995] border-gray-600 rounded">
@@ -1342,15 +1044,14 @@
                                                 </span>
                                             </label>
                                         </div>
-                                        
-                                        <button 
+
+                                        <button
                                             @click="completePayment"
                                             :disabled="!canCompletePayment"
                                             :class="[
                                                 'w-full py-3 px-4 text-white font-medium rounded-lg shadow-lg transition-all duration-300 flex items-center justify-center mt-6',
                                                 !canCompletePayment ? 'bg-gray-500 cursor-not-allowed' : 'bg-[#037995] hover:bg-[#026980]'
-                                            ]"
-                                        >
+                                            ]">
                                             <span class="mr-2">Completar Pago</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -1358,67 +1059,67 @@
                                             </svg>
                                         </button>
                                     </div>
-                                    
+
                                     <!-- Resumen de compra -->
                                     <div class="bg-gray-700 rounded-lg p-4">
                                         <h3 class="text-md font-medium text-white mb-4">Resumen de Compra</h3>
-                                        
+
                                         <div class="space-y-3">
                                             <div x-show="paymentType === 'tickets'">
                                                 <div class="flex justify-between">
                                                     <span class="text-gray-300">Ruta:</span>
                                                     <span class="text-white" x-text="ticketForm.origin + ' - ' + ticketForm.destination"></span>
                                                 </div>
-                                                
+
                                                 <div class="flex justify-between">
                                                     <span class="text-gray-300">Fecha:</span>
                                                     <span class="text-white" x-text="formatDate(ticketForm.date)"></span>
                                                 </div>
-                                                
+
                                                 <div class="flex justify-between">
                                                     <span class="text-gray-300">Hora:</span>
                                                     <span class="text-white" x-text="selectedRoute.time"></span>
                                                 </div>
-                                                
+
                                                 <div class="flex justify-between">
                                                     <span class="text-gray-300">Asientos:</span>
                                                     <span class="text-white" x-text="selectedSeats.join(', ')"></span>
                                                 </div>
                                             </div>
-                                            
+
                                             <div x-show="paymentType === 'shipping'">
                                                 <div class="flex justify-between">
                                                     <span class="text-gray-300">Tipo de Paquete:</span>
                                                     <span class="text-white" x-text="getPackageTypeName(packageForm.type)"></span>
                                                 </div>
-                                                
+
                                                 <div class="flex justify-between">
                                                     <span class="text-gray-300">Origen:</span>
                                                     <span class="text-white" x-text="packageForm.origin"></span>
                                                 </div>
-                                                
+
                                                 <div class="flex justify-between">
                                                     <span class="text-gray-300">Destino:</span>
                                                     <span class="text-white" x-text="packageForm.destination"></span>
                                                 </div>
-                                                
+
                                                 <div class="flex justify-between">
                                                     <span class="text-gray-300">Peso:</span>
                                                     <span class="text-white" x-text="packageForm.weight + ' kg'"></span>
                                                 </div>
                                             </div>
-                                            
+
                                             <div class="border-t border-gray-600 my-3 pt-3">
                                                 <div class="flex justify-between mt-3 text-lg font-bold">
                                                     <span class="text-gray-300">Total a Pagar:</span>
-                                                    <span class="text-white" x-text="paymentType === 'tickets' ? 
-                                                        '$' + (selectedRoute.price * ticketForm.passengers * 1.16).toFixed(2) : 
+                                                    <span class="text-white" x-text="paymentType === 'tickets' ?
+                                                        '$' + (selectedRoute.price * ticketForm.passengers * 1.16).toFixed(2) :
                                                         '$' + shippingCost.toFixed(2)">
                                                     </span>
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="mt-6 bg-gray-800 p-4 rounded-lg">
                                             <div class="flex items-center">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#037995] mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1430,7 +1131,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Confirmación -->
                             <div x-show="ticketStep === 'confirmation'">
                                 <div class="text-center py-6">
@@ -1440,47 +1141,46 @@
                                             <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                         </svg>
                                     </div>
-                                    
+
                                     <h2 class="text-xl font-bold text-white mb-2">¡Pago Completado con Éxito!</h2>
                                     <p class="text-gray-300 mb-6">Tu reserva ha sido confirmada. Recibirás un correo electrónico con los detalles.</p>
-                                    
+
                                     <div class="bg-gray-700 rounded-lg p-6 max-w-md mx-auto mb-6">
                                         <h3 class="text-lg font-medium text-white mb-4">Código de Confirmación</h3>
-                                        
+
                                         <div class="bg-white p-2 rounded-lg mb-2 mx-auto w-40 h-40">
                                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=TICKET12345678" alt="QR Code" class="w-full h-full" />
                                         </div>
-                                        
+
                                         <p class="text-lg font-bold text-[#037995] mb-4">TICKET12345678</p>
-                                        
+
                                         <div class="text-left space-y-2">
                                             <div class="flex justify-between">
                                                 <span class="text-gray-300">Ruta:</span>
                                                 <span class="text-white" x-text="ticketForm.origin + ' - ' + ticketForm.destination"></span>
                                             </div>
-                                            
+
                                             <div class="flex justify-between">
                                                 <span class="text-gray-300">Fecha:</span>
                                                 <span class="text-white" x-text="formatDate(ticketForm.date)"></span>
                                             </div>
-                                            
+
                                             <div class="flex justify-between">
                                                 <span class="text-gray-300">Hora:</span>
                                                 <span class="text-white" x-text="selectedRoute.time"></span>
                                             </div>
-                                            
+
                                             <div class="flex justify-between">
                                                 <span class="text-gray-300">Asientos:</span>
                                                 <span class="text-white" x-text="selectedSeats.join(', ')"></span>
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-4">
-                                        <button 
+                                        <button
                                             @click="downloadTicket"
-                                            class="py-2 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center"
-                                        >
+                                            class="py-2 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                                 <polyline points="7 10 12 15 17 10"></polyline>
@@ -1488,11 +1188,10 @@
                                             </svg>
                                             Descargar Boleto
                                         </button>
-                                        
-                                        <button 
+
+                                        <button
                                             @click="activeTab = 'dashboard'"
-                                            class="py-2 px-4 bg-gray-700 text-white font-medium rounded-lg shadow-lg hover:bg-gray-600 transition-all duration-300 flex items-center justify-center"
-                                        >
+                                            class="py-2 px-4 bg-gray-700 text-white font-medium rounded-lg shadow-lg hover:bg-gray-600 transition-all duration-300 flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -1507,7 +1206,7 @@
                 </div>
             </div>
         </main>
-        
+
         <!-- Footer -->
         <footer class="bg-gray-800 border-t border-gray-700 mt-auto">
             <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -1541,305 +1240,316 @@
             </div>
         </footer>
     </div>
+</main>
+@endsection
 
-    <script>
-        function transportApp() {
-            return {
-                // Estado general
-                currentScreen: 'login',
-                activeTab: 'dashboard',
-                mobileMenuOpen: false,
-                profileDropdown: false,
-                
-                // Formularios de login y registro
-                showRegister: false,
-                loginForm: {
-                    email: '',
-                    password: ''
+@section('scripts')
+<script>
+    function transportApp() {
+        return {
+            // Estado general
+            currentScreen: 'dashboard',
+            activeTab: 'dashboard',
+            mobileMenuOpen: false,
+            profileDropdown: false,
+
+            // Formularios de login y registro
+            showRegister: false,
+            loginForm: {
+                email: '',
+                password: ''
+            },
+            registerForm: {
+                firstName: '',
+                lastName: '',
+                email: '',
+                password: '',
+                confirmPassword: ''
+            },
+
+            // Actividades recientes
+            recentActivities: [{
+                    title: 'Boleto reservado',
+                    description: 'Ciudad de México a Guadalajara - 28/03/2023',
+                    status: 'Confirmado',
+                    statusClass: 'bg-green-100 text-green-800'
                 },
-                registerForm: {
-                    firstName: '',
-                    lastName: '',
-                    email: '',
-                    password: '',
-                    confirmPassword: ''
+                {
+                    title: 'Paquete enviado',
+                    description: 'Envío #12345 - En tránsito',
+                    status: 'En progreso',
+                    statusClass: 'bg-yellow-100 text-yellow-800'
                 },
-                
-                // Actividades recientes
-                recentActivities: [
-                    {
-                        title: 'Boleto reservado',
-                        description: 'Ciudad de México a Guadalajara - 28/03/2023',
-                        status: 'Confirmado',
-                        statusClass: 'bg-green-100 text-green-800'
+                {
+                    title: 'Boleto cancelado',
+                    description: 'Monterrey a Tijuana - 15/03/2023',
+                    status: 'Cancelado',
+                    statusClass: 'bg-red-100 text-red-800'
+                }
+            ],
+
+            // Formulario de envío de paquetes
+            packageForm: {
+                type: 'small',
+                weight: 1,
+                length: 20,
+                width: 15,
+                height: 10,
+                value: 100,
+                description: '',
+                origin: '',
+                destination: '',
+                recipientName: '',
+                recipientPhone: '',
+                recipientEmail: ''
+            },
+            showShippingSummary: false,
+            shippingCost: 0,
+            estimatedDeliveryTime: '',
+
+            // Formulario de compra de boletos
+            ticketForm: {
+                origin: '',
+                destination: '',
+                date: '',
+                passengers: 1
+            },
+            ticketStep: 'search',
+            availableRoutes: [],
+            selectedRoute: {},
+            seats: [],
+            selectedSeats: [],
+
+            // Pago
+            paymentVisible: false,
+            paymentType: '',
+            paymentMethods: [{
+                    id: 'card',
+                    name: 'Tarjeta'
+                },
+                {
+                    id: 'paypal',
+                    name: 'PayPal'
+                },
+                {
+                    id: 'transfer',
+                    name: 'Transferencia'
+                },
+                {
+                    id: 'cash',
+                    name: 'Efectivo'
+                }
+            ],
+            paymentForm: {
+                method: 'card',
+                cardNumber: '',
+                expiry: '',
+                cvv: '',
+                cardName: '',
+                paypalEmail: '',
+                reference: '',
+                terms: false
+            },
+
+            // Métodos
+            login() {
+                // Simulación de inicio de sesión
+                console.log('Iniciando sesión con:', this.loginForm);
+                this.currentScreen = 'dashboard';
+            },
+
+            register() {
+                // Simulación de registro
+                console.log('Registrando usuario:', this.registerForm);
+                this.showRegister = false;
+                alert('Registro exitoso. Por favor inicia sesión.');
+            },
+
+            logout() {
+                // Simulación de cierre de sesión
+                this.currentScreen = 'login';
+            },
+
+            calculateShipping() {
+                // Simulación de cálculo de envío
+                const baseRate = 100;
+                const weightRate = this.packageForm.weight * 10;
+                const volumeRate = (this.packageForm.length * this.packageForm.width * this.packageForm.height) / 1000 * 5;
+
+                this.shippingCost = baseRate + weightRate + volumeRate;
+                this.estimatedDeliveryTime = '1-2 días hábiles';
+                this.showShippingSummary = true;
+            },
+
+            getPackageTypeName(type) {
+                const types = {
+                    'document': 'Documento',
+                    'small': 'Paquete Pequeño',
+                    'medium': 'Paquete Mediano',
+                    'large': 'Paquete Grande',
+                    'special': 'Carga Especial'
+                };
+
+                return types[type] || type;
+            },
+
+            searchRoutes() {
+                // Simulación de búsqueda de rutas
+                this.availableRoutes = [{
+                        time: '08:00 AM',
+                        duration: '5h 30m',
+                        type: 'Directo',
+                        seats: 45,
+                        price: 850,
+                        class: 'Ejecutivo'
                     },
                     {
-                        title: 'Paquete enviado',
-                        description: 'Envío #12345 - En tránsito',
-                        status: 'En progreso',
-                        statusClass: 'bg-yellow-100 text-yellow-800'
+                        time: '12:30 PM',
+                        duration: '5h 45m',
+                        type: 'Directo',
+                        seats: 32,
+                        price: 780,
+                        class: 'Estándar'
                     },
                     {
-                        title: 'Boleto cancelado',
-                        description: 'Monterrey a Tijuana - 15/03/2023',
-                        status: 'Cancelado',
-                        statusClass: 'bg-red-100 text-red-800'
+                        time: '16:00 PM',
+                        duration: '6h 00m',
+                        type: 'Con escala',
+                        seats: 18,
+                        price: 650,
+                        class: 'Económico'
                     }
-                ],
-                
-                // Formulario de envío de paquetes
-                packageForm: {
-                    type: 'small',
-                    weight: 1,
-                    length: 20,
-                    width: 15,
-                    height: 10,
-                    value: 100,
-                    description: '',
-                    origin: '',
-                    destination: '',
-                    recipientName: '',
-                    recipientPhone: '',
-                    recipientEmail: ''
-                },
-                showShippingSummary: false,
-                shippingCost: 0,
-                estimatedDeliveryTime: '',
-                
-                // Formulario de compra de boletos
-                ticketForm: {
-                    origin: '',
-                    destination: '',
-                    date: '',
-                    passengers: 1
-                },
-                ticketStep: 'search',
-                availableRoutes: [],
-                selectedRoute: {},
-                seats: [],
-                selectedSeats: [],
-                
-                // Pago
-                paymentVisible: false,
-                paymentType: '',
-                paymentMethods: [
-                    { id: 'card', name: 'Tarjeta' },
-                    { id: 'paypal', name: 'PayPal' },
-                    { id: 'transfer', name: 'Transferencia' },
-                    { id: 'cash', name: 'Efectivo' }
-                ],
-                paymentForm: {
-                    method: 'card',
-                    cardNumber: '',
-                    expiry: '',
-                    cvv: '',
-                    cardName: '',
-                    paypalEmail: '',
-                    reference: '',
-                    terms: false
-                },
-                
-                // Métodos
-                login() {
-                    // Simulación de inicio de sesión
-                    console.log('Iniciando sesión con:', this.loginForm);
-                    this.currentScreen = 'dashboard';
-                },
-                
-                register() {
-                    // Simulación de registro
-                    console.log('Registrando usuario:', this.registerForm);
-                    this.showRegister = false;
-                    alert('Registro exitoso. Por favor inicia sesión.');
-                },
-                
-                logout() {
-                    // Simulación de cierre de sesión
-                    this.currentScreen = 'login';
-                },
-                
-                calculateShipping() {
-                    // Simulación de cálculo de envío
-                    const baseRate = 100;
-                    const weightRate = this.packageForm.weight * 10;
-                    const volumeRate = (this.packageForm.length * this.packageForm.width * this.packageForm.height) / 1000 * 5;
-                    
-                    this.shippingCost = baseRate + weightRate + volumeRate;
-                    this.estimatedDeliveryTime = '1-2 días hábiles';
-                    this.showShippingSummary = true;
-                },
-                
-                getPackageTypeName(type) {
-                    const types = {
-                        'document': 'Documento',
-                        'small': 'Paquete Pequeño',
-                        'medium': 'Paquete Mediano',
-                        'large': 'Paquete Grande',
-                        'special': 'Carga Especial'
-                    };
-                    
-                    return types[type] || type;
-                },
-                
-                searchRoutes() {
-                    // Simulación de búsqueda de rutas
-                    this.availableRoutes = [
-                        {
-                            time: '08:00 AM',
-                            duration: '5h 30m',
-                            type: 'Directo',
-                            seats: 45,
-                            price: 850,
-                            class: 'Ejecutivo'
-                        },
-                        {
-                            time: '12:30 PM',
-                            duration: '5h 45m',
-                            type: 'Directo',
-                            seats: 32,
-                            price: 780,
-                            class: 'Estándar'
-                        },
-                        {
-                            time: '16:00 PM',
-                            duration: '6h 00m',
-                            type: 'Con escala',
-                            seats: 18,
-                            price: 650,
-                            class: 'Económico'
-                        }
-                    ];
-                    
-                    this.ticketStep = 'results';
-                },
-                
-                selectRoute(route) {
-                    this.selectedRoute = route;
-                    this.generateSeats();
-                    this.ticketStep = 'seats';
-                },
-                
-                generateSeats() {
-                    this.seats = [];
-                    this.selectedSeats = [];
-                    
-                    // Generar 40 asientos con estados aleatorios
-                    for (let i = 1; i <= 40; i++) {
-                        const random = Math.random();
-                        let status = 'available';
-                        
-                        // 30% de probabilidad de que el asiento esté ocupado
-                        if (random < 0.3) {
-                            status = 'occupied';
-                        }
-                        
-                        this.seats.push({
-                            id: i,
-                            status: status
-                        });
+                ];
+
+                this.ticketStep = 'results';
+            },
+
+            selectRoute(route) {
+                this.selectedRoute = route;
+                this.generateSeats();
+                this.ticketStep = 'seats';
+            },
+
+            generateSeats() {
+                this.seats = [];
+                this.selectedSeats = [];
+
+                // Generar 40 asientos con estados aleatorios
+                for (let i = 1; i <= 40; i++) {
+                    const random = Math.random();
+                    let status = 'available';
+
+                    // 30% de probabilidad de que el asiento esté ocupado
+                    if (random < 0.3) {
+                        status = 'occupied';
                     }
-                },
-                selectSeat(seat) {
-                    if (seat.status === 'occupied') return;
-                    
-                    if (seat.status === 'selected') {
-                        seat.status = 'available';
-                        this.selectedSeats = this.selectedSeats.filter(id => id !== seat.id);
-                    } else if (this.selectedSeats.length < this.ticketForm.passengers) {
-                        seat.status = 'selected';
-                        this.selectedSeats.push(seat.id);
-                    }
-                },
-                
-                formatDate(dateString) {
-                    if (!dateString) return '';
-                    
-                    const date = new Date(dateString);
-                    return date.toLocaleDateString('es-ES', { 
-                        day: '2-digit', 
-                        month: '2-digit', 
-                        year: 'numeric' 
+
+                    this.seats.push({
+                        id: i,
+                        status: status
                     });
-                },
-                
-                proceedToPayment(type) {
-                    this.paymentType = type;
-                    
-                    if (type === 'tickets') {
-                        this.ticketStep = 'payment';
-                    } else {
-                        this.paymentVisible = true;
-                    }
-                },
-                
-                goBackFromPayment() {
+                }
+            },
+            selectSeat(seat) {
+                if (seat.status === 'occupied') return;
+
+                if (seat.status === 'selected') {
+                    seat.status = 'available';
+                    this.selectedSeats = this.selectedSeats.filter(id => id !== seat.id);
+                } else if (this.selectedSeats.length < this.ticketForm.passengers) {
+                    seat.status = 'selected';
+                    this.selectedSeats.push(seat.id);
+                }
+            },
+
+            formatDate(dateString) {
+                if (!dateString) return '';
+
+                const date = new Date(dateString);
+                return date.toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            },
+
+            proceedToPayment(type) {
+                this.paymentType = type;
+
+                if (type === 'tickets') {
+                    this.ticketStep = 'payment';
+                } else {
+                    this.paymentVisible = true;
+                }
+            },
+
+            goBackFromPayment() {
+                if (this.paymentType === 'tickets') {
+                    this.ticketStep = 'seats';
+                } else {
+                    this.paymentVisible = false;
+                }
+            },
+
+            get canCompletePayment() {
+                if (!this.paymentForm.terms) return false;
+
+                if (this.paymentForm.method === 'card') {
+                    return this.paymentForm.cardNumber &&
+                        this.paymentForm.expiry &&
+                        this.paymentForm.cvv &&
+                        this.paymentForm.cardName;
+                }
+
+                if (this.paymentForm.method === 'paypal') {
+                    return this.paymentForm.paypalEmail;
+                }
+
+                if (this.paymentForm.method === 'transfer') {
+                    return this.paymentForm.reference;
+                }
+
+                return true; // Para efectivo
+            },
+
+            completePayment() {
+                // Simulación de procesamiento de pago
+                setTimeout(() => {
                     if (this.paymentType === 'tickets') {
-                        this.ticketStep = 'seats';
+                        this.ticketStep = 'confirmation';
                     } else {
                         this.paymentVisible = false;
+                        this.showShippingSummary = false;
+
+                        // Reiniciar formulario
+                        this.packageForm = {
+                            type: 'small',
+                            weight: 1,
+                            length: 20,
+                            width: 15,
+                            height: 10,
+                            value: 100,
+                            description: '',
+                            origin: '',
+                            destination: '',
+                            recipientName: '',
+                            recipientPhone: '',
+                            recipientEmail: ''
+                        };
+
+                        // Mostrar mensaje de éxito
+                        alert('¡Pago completado con éxito! Tu envío ha sido registrado.');
+
+                        // Volver al dashboard
+                        this.activeTab = 'dashboard';
                     }
-                },
-                
-                get canCompletePayment() {
-                    if (!this.paymentForm.terms) return false;
-                    
-                    if (this.paymentForm.method === 'card') {
-                        return this.paymentForm.cardNumber && 
-                               this.paymentForm.expiry && 
-                               this.paymentForm.cvv && 
-                               this.paymentForm.cardName;
-                    }
-                    
-                    if (this.paymentForm.method === 'paypal') {
-                        return this.paymentForm.paypalEmail;
-                    }
-                    
-                    if (this.paymentForm.method === 'transfer') {
-                        return this.paymentForm.reference;
-                    }
-                    
-                    return true; // Para efectivo
-                },
-                
-                completePayment() {
-                    // Simulación de procesamiento de pago
-                    setTimeout(() => {
-                        if (this.paymentType === 'tickets') {
-                            this.ticketStep = 'confirmation';
-                        } else {
-                            this.paymentVisible = false;
-                            this.showShippingSummary = false;
-                            
-                            // Reiniciar formulario
-                            this.packageForm = {
-                                type: 'small',
-                                weight: 1,
-                                length: 20,
-                                width: 15,
-                                height: 10,
-                                value: 100,
-                                description: '',
-                                origin: '',
-                                destination: '',
-                                recipientName: '',
-                                recipientPhone: '',
-                                recipientEmail: ''
-                            };
-                            
-                            // Mostrar mensaje de éxito
-                            alert('¡Pago completado con éxito! Tu envío ha sido registrado.');
-                            
-                            // Volver al dashboard
-                            this.activeTab = 'dashboard';
-                        }
-                    }, 1500);
-                },
-                
-                downloadTicket() {
-                    alert('Boleto descargado correctamente.');
-                }
-            };
-        }
-    </script>
-</body>
-</html>
+                }, 1500);
+            },
+
+            downloadTicket() {
+                alert('Boleto descargado correctamente.');
+            }
+        };
+    }
+</script>
+@endsection
