@@ -24,7 +24,10 @@ class Encomienda extends Model
         'estado', 
         'fecha_envio', 
         'fecha_entrega', 
-        'usuario_id'
+        'usuario_id', 
+        'nombre_destinatario', 
+        'telefono_destinatario', 
+        'correo_destinatario'
     ];
 
     public function usuario()
