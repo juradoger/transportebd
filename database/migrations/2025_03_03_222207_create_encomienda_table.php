@@ -12,7 +12,7 @@ class CreateEncomiendaTable extends Migration
             $table->id();
             $table->text('descripcion');
             $table->decimal('peso', 5, 2)->nullable();
-            $table->enum('tipo_paquete', ['Estándar', 'Otro'])->default('Estándar');
+            $table->enum('tipo_paquete', ['Documento', 'Paquete Pequeño', 'Paquete Grande', 'Carga Especial'])->default('Documento');
             $table->decimal('largo', 5, 2)->nullable();
             $table->decimal('ancho', 5, 2)->nullable();
             $table->decimal('alto', 5, 2)->nullable();

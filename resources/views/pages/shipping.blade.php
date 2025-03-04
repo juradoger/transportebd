@@ -42,17 +42,6 @@
                                         min="0.1"
                                     />
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-300 mb-1">Valor Declarado ($)</label>
-                                    <input 
-                                        type="number" 
-                                        x-model="packageForm.value"
-                                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#037995]"
-                                        placeholder="100"
-                                        step="1"
-                                        min="0"
-                                    />
-                                </div>
                             </div>
                             
                             <div>
@@ -260,7 +249,7 @@
                                 @click="proceedToPayment('shipping')"
                                 class="w-full py-3 px-4 bg-[#037995] text-white font-medium rounded-lg shadow-lg hover:bg-[#026980] transition-all duration-300 flex items-center justify-center mt-6"
                             >
-                                <span class="mr-2">Proceder al Pago</span>
+                                <span class="mr-2" onclick="window.location.href='/formulariopago'">Proceder al Pago</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
                                     <line x1="1" y1="10" x2="23" y2="10"></line>

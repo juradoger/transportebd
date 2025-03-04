@@ -27,6 +27,11 @@ Route::get('/', function () {
 Route::get('/shipping', function () {
     return view('pages.shipping');
 });
+
+Route::get('/formulariopago', function () {
+    return view('pages.formulariopago');
+});
+
 Route::get('/tickets', function () {
     return view('pages.tickets');
 });
