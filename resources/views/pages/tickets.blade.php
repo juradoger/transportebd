@@ -27,6 +27,7 @@
                                             <option>Potosi</option>
                                             <option>Sucre</option>
                                             <option>Cochabamba</option>
+                                            <option>Tarija</option>
                                         </select>
                                     </div>
 
@@ -41,6 +42,7 @@
                                             <option>Monterrey</option>
                                             <option>Puebla</option>
                                             <option>Tijuana</option>
+                                            <option>Bermejo</option>
                                         </select>
                                     </div>
 
@@ -138,7 +140,7 @@
                                             </div>
 
                                             <div class="mt-4 md:mt-0 flex flex-col items-end">
-                                                <p class="text-2xl font-bold text-white" x-text="'$' + route.price"></p>
+                                                <p class="text-2xl font-bold text-white" x-text="'Bs. ' + route.price"></p>
                                                 <p class="text-sm text-gray-400">por persona</p>
                                             </div>
                                         </div>
@@ -382,22 +384,22 @@
                                             <div class="border-t border-gray-600 my-3 pt-3">
                                                 <div class="flex justify-between">
                                                     <span class="text-gray-300">Precio por boleto:</span>
-                                                    <span class="text-white" x-text="'$' + selectedRoute.price"></span>
+                                                    <span class="text-white" x-text="'Bs.' + selectedRoute.price"></span>
                                                 </div>
 
                                                 <div class="flex justify-between mt-1">
                                                     <span class="text-gray-300">Subtotal:</span>
-                                                    <span class="text-white" x-text="'$' + (selectedRoute.price * ticketForm.passengers).toFixed(2)"></span>
+                                                    <span class="text-white" x-text="'Bs.' + (selectedRoute.price * ticketForm.passengers).toFixed(2)"></span>
                                                 </div>
 
                                                 <div class="flex justify-between mt-1">
                                                     <span class="text-gray-300">Impuestos:</span>
-                                                    <span class="text-white" x-text="'$' + (selectedRoute.price * ticketForm.passengers * 0.16).toFixed(2)"></span>
+                                                    <span class="text-white" x-text="'Bs.' + (selectedRoute.price * ticketForm.passengers * 0.16).toFixed(2)"></span>
                                                 </div>
 
                                                 <div class="flex justify-between mt-3 text-lg font-bold">
                                                     <span class="text-gray-300">Total:</span>
-                                                    <span class="text-white" x-text="'$' + (selectedRoute.price * ticketForm.passengers * 1.16).toFixed(2)"></span>
+                                                    <span class="text-white" x-text="'Bs.' + (selectedRoute.price * ticketForm.passengers * 1.16).toFixed(2)"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -749,19 +751,7 @@
 
             // Formularios de login y registro
             showRegister: false,
-            loginForm: {
-                email: '',
-                password: ''
-            },
-            registerForm: {
-                firstName: '',
-                lastName: '',
-                email: '',
-                password: '',
-                confirmPassword: ''
-            },
 
-            // Actividades recientes
             recentActivities: [{
                     title: 'Boleto reservado',
                     description: 'Ciudad de México a Guadalajara - 28/03/2023',
@@ -887,9 +877,12 @@
                 return types[type] || type;
             },
 
-            searchRoutes() {
+            async searchRoutes() {
                 // Simulación de búsqueda de rutas
-                this.availableRoutes = [{
+
+
+
+                /* this.availableRoutes = [{
                         time: '08:00 AM',
                         duration: '5h 30m',
                         type: 'Directo',
@@ -913,7 +906,30 @@
                         price: 650,
                         class: 'Económico'
                     }
-                ];
+                ]; */
+
+                // fetch to /boletos/buscar GET  send ticketForm search params
+
+                const searchParams = new URLSearchParams(this.ticketForm)
+
+                const response = await fetch('/rutas/buscar?' + searchParams.toString(), {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                });
+
+                const availableRoutes = (await response.json()) ?? [];
+
+                this.availableRoutes = availableRoutes.map(route => ({
+                    time: route.horario,
+                    duration: route.duracion,
+                    type: 'Directo',
+                    seats: route.asientos_disponibles,
+                    price: route.precio,
+                    class: route.clase
+                }));
 
                 this.ticketStep = 'results';
             },

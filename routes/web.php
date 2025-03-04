@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\BoletoController;
+use App\Http\Controllers\RutaController;
+use App\Http\Controllers\ViajeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -12,7 +15,6 @@ Route::get('/', function () {
     return view('InterfazUsuario');
 });
 
-// pages login.blade
 Route::get('/login', function () {
     return view('pages.login');
 });
@@ -26,3 +28,7 @@ Route::get('/shipping', function () {
 Route::get('/tickets', function () {
     return view('pages.tickets');
 });
+
+Route::get('/boletos/buscar', [BoletoController::class, 'buscar'])->name('boletos.buscar');
+Route::get('/rutas/buscar', [RutaController::class, 'buscar'])->name('rutas.buscar');
+Route::get('/viajes/buscar', [ViajeController::class, 'buscar'])->name('viajes.buscar');

@@ -2,26 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Boleto;
+use App\Models\Viaje;
+use Illuminate\Http\Request;
 
-class BoletoController extends Controller
+class ViajeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $boletos = Boleto::all();
-        return view('boletos.index', compact('boletos'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('boletos.create');
+        //
     }
 
     /**
@@ -29,15 +21,7 @@ class BoletoController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'price' => 'required|numeric',
-        ]);
-
-        Boleto::create($request->all());
-
-        return redirect()->route('boletos.index')
-            ->with('success', 'Boleto created successfully.');
+        //
     }
 
     /**
@@ -45,17 +29,7 @@ class BoletoController extends Controller
      */
     public function show(string $id)
     {
-        $boleto = Boleto::findOrFail($id);
-        return view('boletos.show', compact('boleto'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $boleto = Boleto::findOrFail($id);
-        return view('boletos.edit', compact('boleto'));
+        //
     }
 
     /**
@@ -63,16 +37,7 @@ class BoletoController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'name' => 'required',
-            'price' => 'required|numeric',
-        ]);
-
-        $boleto = Boleto::findOrFail($id);
-        $boleto->update($request->all());
-
-        return redirect()->route('boletos.index')
-            ->with('success', 'Boleto updated successfully.');
+        //
     }
 
     /**
@@ -80,11 +45,7 @@ class BoletoController extends Controller
      */
     public function destroy(string $id)
     {
-        $boleto = Boleto::findOrFail($id);
-        $boleto->delete();
-
-        return redirect()->route('boletos.index')
-            ->with('success', 'Boleto deleted successfully.');
+        //
     }
 
     /**
@@ -92,7 +53,7 @@ class BoletoController extends Controller
      */
     public function buscar(Request $request)
     {
-        $query = Boleto::with(['ruta', 'vehiculo']);
+        $query = Viaje::with(['ruta', 'vehiculo']);
 
         if ($request->has('origen')) {
             $query->whereHas('ruta', function ($q) use ($request) {
@@ -106,12 +67,6 @@ class BoletoController extends Controller
             });
         }
 
-        if ($request->has('ciudad')) {
-            $query->whereHas('ruta', function ($q) use ($request) {
-                $q->where('ciudad', $request->input('ciudad'));
-            });
-        }
-
         if ($request->has('fecha_viaje')) {
             $query->whereDate('fecha_viaje', $request->input('fecha_viaje'));
         }
@@ -122,7 +77,7 @@ class BoletoController extends Controller
 
         $boletos = $query->get()->map(function ($boleto) {
             $vehiculo = $boleto->vehiculo;
-            $boletosUtilizados = Boleto::where('ruta_id', $boleto->ruta_id)
+            $boletosUtilizados = Boleto::where('viaje_id', $boleto->viaje_id)
                 ->where('estado', 'Utilizado')
                 ->count();
             $boleto->asientos_disponibles = $vehiculo->capacidad - $boletosUtilizados;

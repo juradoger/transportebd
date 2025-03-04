@@ -10,15 +10,13 @@ class CreateBoletoTable extends Migration
     {
         Schema::create('boleto', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('vehiculo_id');
-            $table->unsignedBigInteger('ruta_id');
+            $table->unsignedBigInteger('viaje_id');
             $table->integer('nro_asiento');
             $table->string('codigo_qr', 255);
             $table->date('fecha_viaje');
             $table->enum('estado', ['Emitido', 'Utilizado', 'Cancelado'])->default('Emitido');
             $table->decimal('precio', 10, 2);
-            $table->foreign('vehiculo_id')->references('id')->on('vehiculo')->onDelete('cascade');
-            $table->foreign('ruta_id')->references('id')->on('ruta')->onDelete('cascade');
+            $table->foreign('viaje_id')->references('id')->on('viaje')->onDelete('cascade');
             $table->timestamps();
         });
     }
