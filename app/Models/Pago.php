@@ -11,10 +11,10 @@ class Pago extends Model
 
     protected $table = 'pago';
     protected $primaryKey = 'id';
-    protected $fillable = ['usuario_id', 'monto', 'fecha', 'metodo'];
+    protected $fillable = ['user_id', 'monto', 'fecha', 'metodo'];
 
-    public function usuario()
+    public function user()
     {
-        return $this->belongsTo(Usuario::class);
+        return $this->belongsTo(User::class);
     }
 }

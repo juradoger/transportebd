@@ -12,26 +12,26 @@ class Encomienda extends Model
     protected $table = 'encomienda';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'descripcion', 
-        'peso', 
-        'tipo_paquete', 
-        'largo', 
-        'ancho', 
-        'alto', 
-        'origen', 
-        'destino', 
-        'codigo_rastreo', 
-        'estado', 
-        'fecha_envio', 
-        'fecha_entrega', 
-        'usuario_id', 
-        'nombre_destinatario', 
-        'telefono_destinatario', 
+        'descripcion',
+        'peso',
+        'tipo_paquete',
+        'largo',
+        'ancho',
+        'alto',
+        'origen',
+        'destino',
+        'codigo_rastreo',
+        'estado',
+        'fecha_envio',
+        'fecha_entrega',
+        'user_id',
+        'nombre_destinatario',
+        'telefono_destinatario',
         'correo_destinatario'
     ];
 
-    public function usuario()
+    public function user()
     {
-        return $this->belongsTo(Usuario::class);
+        return $this->belongsTo(User::class);
     }
 }

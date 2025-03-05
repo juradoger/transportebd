@@ -10,11 +10,11 @@ class CreatePagoTable extends Migration
     {
         Schema::create('pago', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('usuario_id');
+            $table->unsignedBigInteger('user_id');
             $table->decimal('monto', 10, 2);
             $table->date('fecha');
             $table->enum('metodo', ['Efectivo', 'Tarjeta', 'Transferencia', 'Móvil']);
-            $table->foreign('usuario_id')->references('id')->on('usuario')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

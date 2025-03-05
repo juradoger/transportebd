@@ -12,16 +12,16 @@ class DetalleReserva extends Model
     protected $table = 'detalle_reserva';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'usuario_id',
+        'user_id',
         'reserva_id',
         'cantidad',
         'fecha_reserva',
         'precio_total'
     ];
 
-    public function usuario()
+    public function user()
     {
-        return $this->belongsTo(Usuario::class);
+        return $this->belongsTo(User::class);
     }
 
     public function reserva()

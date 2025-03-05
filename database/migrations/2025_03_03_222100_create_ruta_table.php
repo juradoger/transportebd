@@ -15,6 +15,7 @@ class CreateRutaTable extends Migration
             $table->string('duracion')->nullable();
             $table->string('clase')->nullable();
             $table->time('horario')->nullable();
+            $table->string(column: 'maps_url')->nullable();
             $table->timestamps();
         });
     }

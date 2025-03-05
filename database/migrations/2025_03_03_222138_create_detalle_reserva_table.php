@@ -10,12 +10,12 @@ class CreateDetalleReservaTable extends Migration
     {
         Schema::create('detalle_reserva', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('usuario_id');
+            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('reserva_id');
             $table->integer('cantidad');
             $table->date('fecha_reserva');
             $table->decimal('precio_total', 10, 2);
-            $table->foreign('usuario_id')->references('id')->on('usuario')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('reserva_id')->references('id')->on('reserva')->onDelete('cascade');
             $table->timestamps();
         });

@@ -11,10 +11,10 @@ class Reporte extends Model
 
     protected $table = 'reporte';
     protected $primaryKey = 'id';
-    protected $fillable = ['titulo', 'descripcion', 'fecha_creacion', 'usuario_id'];
+    protected $fillable = ['titulo', 'descripcion', 'fecha_creacion', 'user_id'];
 
-    public function usuario()
+    public function user()
     {
-        return $this->belongsTo(Usuario::class);
+        return $this->belongsTo(User::class);
     }
 }

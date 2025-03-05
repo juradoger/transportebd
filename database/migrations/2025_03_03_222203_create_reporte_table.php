@@ -14,8 +14,8 @@ class CreateReporteTable extends Migration
             $table->string('titulo', 255);
             $table->text('descripcion')->nullable();
             $table->date('fecha_creacion')->default(DB::raw('(CURRENT_DATE)'));
-            $table->unsignedBigInteger('usuario_id');
-            $table->foreign('usuario_id')->references('id')->on('usuario')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

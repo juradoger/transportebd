@@ -10,12 +10,12 @@ class CreateDetalleCompraTable extends Migration
     {
         Schema::create('detalle_compra', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('usuario_id');
+            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('boleto_id');
             $table->integer('cantidad');
             $table->date('fecha_compra');
             $table->decimal('precio_total', 10, 2);
-            $table->foreign('usuario_id')->references('id')->on('usuario')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('boleto_id')->references('id')->on('boleto')->onDelete('cascade');
             $table->timestamps();
         });

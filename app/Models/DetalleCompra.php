@@ -12,16 +12,16 @@ class DetalleCompra extends Model
     protected $table = 'detalle_compra';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'usuario_id',
+        'user_id',
         'boleto_id',
         'cantidad',
         'fecha_compra',
         'precio_total'
     ];
 
-    public function usuario()
+    public function user()
     {
-        return $this->belongsTo(Usuario::class);
+        return $this->belongsTo(User::class);
     }
 
     public function boleto()
