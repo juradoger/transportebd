@@ -1,6 +1,7 @@
 import ClientLayout from '@/layouts/client-layout';
+import { SharedData } from '@/types';
 
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 type Activity = {
@@ -13,6 +14,8 @@ type Activity = {
 
 export default function Dashboard() {
     const [recentActivities, setRecentActivities] = useState<Activity[]>([]);
+
+    const { auth } = usePage<SharedData>().props;
 
     useEffect(() => {
         setRecentActivities([
@@ -50,7 +53,7 @@ export default function Dashboard() {
                         {/* Header */}
                         <div className="py-6">
                             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                                <h1 className="mb-6 text-2xl font-semibold text-white">Bienvenido, Juan</h1>
+                                <h1 className="mb-6 text-2xl font-semibold text-white">Bienvenido, {auth.user.name}</h1>
 
                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                     {/* Envío de Paquetes */}

@@ -4,8 +4,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { paymentMethods } from '@/data/payment-methods';
 import ClientLayout from '@/layouts/client-layout';
 import { useTicketStore } from '@/store/ticket-store';
+import { SharedData } from '@/types';
 
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 interface PaymentForm {
@@ -44,6 +45,8 @@ interface Seat {
 
 export default function TicketsCheckOutPage() {
     const { seats, ticketForm, selectedSeats, selectedViaje } = useTicketStore();
+    const { auth } = usePage<SharedData>().props;
+    const user_id = auth.user.id;
 
     const [paymentForm, setPaymentForm] = useState<PaymentForm>({
         method: 'card',
@@ -122,7 +125,7 @@ export default function TicketsCheckOutPage() {
     const completePayment = async () => {
         if (paymentType === 'tickets') {
             const payload = {
-                user_id: 1,
+                user_id,
                 boleto_ids: selectedSeats,
                 metodo: 'Tarjeta',
                 viaje_id: selectedViaje?.id,
