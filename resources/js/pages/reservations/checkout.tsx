@@ -61,7 +61,7 @@ export default function TicketsCheckOutPage() {
         };
 
         try {
-            router.visit('/tickets/completarPago', {
+            router.visit('/reservations/completarPago', {
                 method: 'post',
                 data: payload,
             });
@@ -78,7 +78,7 @@ export default function TicketsCheckOutPage() {
 
     useEffect(() => {
         if (!seats.length) {
-            router.visit('/tickets', {
+            router.visit('/reservations', {
                 replace: true,
             });
         }

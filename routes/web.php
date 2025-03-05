@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ShipingController;
 use Illuminate\Support\Facades\Route;
@@ -71,6 +72,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('shipings/updateStatus/{id}', [ShipingController::class, 'updateStatus'])
         ->name('shipings.updateStatus');
 
+    Route::get('invoice/{id}', [InvoiceController::class, 'show'])
+        ->name('invoice.show');
 
 
     Route::get('admin/dashboard', function () {
