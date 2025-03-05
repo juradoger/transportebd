@@ -1,14 +1,13 @@
 import { Button } from '@/components/ui/button';
 import ClientLayout from '@/layouts/client-layout';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import html2canvas from 'html2canvas-pro';
 
 export default function TicketsConfirmationPage(props: any) {
     console.log('🚀 ~ TicketsConfirmationPage ~ props:', props);
 
     const downloadTicket = () => {
-        // Lógica para descargar el ticket
-        console.log('Descargando ticket...');
+        router.visit(`/invoice/${props.identifier}`);
     };
 
     const goToDashboard = () => {

@@ -2,6 +2,7 @@ import ClientLayout from '@/layouts/client-layout';
 import { SharedData } from '@/types';
 
 import { Head, usePage } from '@inertiajs/react';
+import { Box, TicketCheckIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 type Activity = {
@@ -62,6 +63,7 @@ export default function Dashboard() {
                                             <div className="mb-4 flex items-center">
                                                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#037995]">
                                                     {/* SVG */}
+                                                    <Box />
                                                 </div>
                                                 <h2 className="ml-4 text-xl font-semibold text-white">Envío de Paquetes</h2>
                                             </div>
@@ -73,7 +75,7 @@ export default function Dashboard() {
 
                                             <button className="flex w-full items-center justify-center rounded-lg bg-[#037995] px-4 py-3 font-medium text-white shadow-lg transition-all duration-300 hover:bg-[#026980]">
                                                 <span className="mr-2">Enviar un Paquete</span>
-                                                {/* SVG */}
+                                                <TicketCheckIcon />
                                             </button>
                                         </div>
                                     </div>
@@ -83,7 +85,7 @@ export default function Dashboard() {
                                         <div className="p-6">
                                             <div className="mb-4 flex items-center">
                                                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#037995]">
-                                                    {/* SVG */}
+                                                    <TicketCheckIcon />
                                                 </div>
                                                 <h2 className="ml-4 text-xl font-semibold text-white">Compra de Boletos</h2>
                                             </div>
@@ -110,7 +112,7 @@ export default function Dashboard() {
                                                 <li key={index} className="px-6 py-4">
                                                     <div className="flex items-center space-x-4">
                                                         <div className="bg-opacity-20 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#037995]">
-                                                            {/* SVG */}
+                                                            <TicketCheckIcon />
                                                         </div>
                                                         <div className="min-w-0 flex-1">
                                                             <p className="truncate text-sm font-medium text-white">{activity.title}</p>
