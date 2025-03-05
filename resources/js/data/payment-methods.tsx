@@ -63,8 +63,8 @@ export const paymentMethods: PaymentMethod[] = [
         ),
     },
     {
-        id: 'Paypal', // Móvil
-        name: 'Paypal',
+        id: 'Móvil', // Móvil
+        name: 'Móvil',
         icon: (
             <svg
                 xmlns="http://www.w3.org/2000/svg"

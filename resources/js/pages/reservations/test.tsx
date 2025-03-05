@@ -696,7 +696,7 @@ export default function TicketPage() {
 
             <div className="py-6">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <h1 className="mb-6 text-2xl font-semibold text-white">Compra de Boletos {counterStore.bears}</h1>
+                    <h1 className="mb-6 text-2xl font-semibold text-white">Reserva de Boletos {counterStore.bears}</h1>
                     <button onClick={counterStore.increasePopulation}>Incrementar</button> {/* Hook up the increment function */}
                     <div className="overflow-hidden rounded-xl border border-gray-700 bg-gray-800 shadow-lg">
                         <div className="p-6">

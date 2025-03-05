@@ -1,13 +1,12 @@
+import PaymentForm from '@/components/payment-form';
 import SummaryShip from '@/components/shiping/summary-ship';
 import SelectedViajeInfo from '@/components/tickets/selected-viaje-info';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { paymentMethods } from '@/data/payment-methods';
 import ClientLayout from '@/layouts/client-layout';
 import { useShipingStore } from '@/store/shiping-store';
 import { SharedData } from '@/types';
 
 import { Head, router, usePage } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 interface PaymentForm {
     method: string;
@@ -48,33 +47,6 @@ export default function TicketsCheckOutPage() {
 
     const { auth } = usePage<SharedData>().props;
 
-    const [paymentForm, setPaymentForm] = useState<PaymentForm>({
-        method: 'card',
-        cardNumber: '',
-        expiry: '',
-        cvv: '',
-        cardName: '',
-        paypalEmail: '',
-        reference: '',
-        terms: false,
-    });
-
-    const [paymentType, setPaymentType] = useState<string>('tickets');
-    const [paymentMethod, setPaymentMethod] = useState('Tarjeta');
-
-    const [urlTicket, setUrlTicket] = useState<string>('');
-
-    const formatDate = (dateString: string): string => {
-        if (!dateString) return '';
-
-        const date = new Date(dateString);
-        return date.toLocaleDateString('es-ES', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-        });
-    };
-
     const getPackageTypeName = (type: string): string => {
         const types: { [key: string]: string } = {
             document: 'Documento',
@@ -87,43 +59,7 @@ export default function TicketsCheckOutPage() {
         return types[type] || type;
     };
 
-    const proceedToPayment = (type: string) => {
-        setPaymentType(type);
-
-        if (type === 'tickets') {
-            // setTicketStep('payment');
-        } else {
-            //  setPaymentVisible(true);
-        }
-    };
-
-    const goBackFromPayment = () => {
-        if (paymentType === 'tickets') {
-            //    setTicketStep('seats');
-        } else {
-            //  setPaymentVisible(false);
-        }
-    };
-
-    const canCompletePayment = (): boolean => {
-        if (!paymentForm.terms) return false;
-
-        if (paymentForm.method === 'card') {
-            return !!(paymentForm.cardNumber && paymentForm.expiry && paymentForm.cvv && paymentForm.cardName);
-        }
-
-        if (paymentForm.method === 'paypal') {
-            return !!paymentForm.paypalEmail;
-        }
-
-        if (paymentForm.method === 'transfer') {
-            return !!paymentForm.reference;
-        }
-
-        return true; // Para efectivo
-    };
-
-    const completePayment = async () => {
+    const completePayment = async (method: string) => {
         const payload = {
             descripcion: packageForm.description,
             peso: packageForm.weight,
@@ -141,7 +77,7 @@ export default function TicketsCheckOutPage() {
             nombre_destinatario: packageForm.recipientName,
             telefono_destinatario: packageForm.recipientPhone,
             correo_destinatario: packageForm.recipientEmail,
-            paymentMethod: paymentMethod,
+            paymentMethod: method,
             total: getTotal(),
         };
 
@@ -178,184 +114,7 @@ export default function TicketsCheckOutPage() {
 
                     <div className="grid grid-cols-1 gap-6 pt-4 md:grid-cols-2">
                         {/* Formulario de pago */}
-                        <div>
-                            <Tabs onValueChange={setPaymentMethod} value={paymentMethod}>
-                                <TabsList className="w-full gap-2 bg-transparent">
-                                    {paymentMethods.map((method) => (
-                                        <TabsTrigger
-                                            value={method.id}
-                                            className="flex w-full flex-1 cursor-pointer flex-col items-center justify-center rounded-lg border bg-gray-700 p-2"
-                                        >
-                                            <div className="mb-1 flex h-8 w-8 items-center justify-center">{method.icon}</div>
-                                            <span className="text-center text-xs text-gray-300">{method.name}</span>
-                                        </TabsTrigger>
-                                    ))}
-                                </TabsList>
-
-                                <TabsContent value="Tarjeta" className="mt-10">
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="mb-1 block text-sm font-medium text-gray-300">Número de Tarjeta</label>
-                                            <input
-                                                type="text"
-                                                className="w-full rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-white focus:ring-2 focus:ring-[#037995] focus:outline-none"
-                                                placeholder="1234 5678 9012 3456"
-                                                maxLength={19}
-                                            />
-                                        </div>
-
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="mb-1 block text-sm font-medium text-gray-300">Fecha de Expiración</label>
-                                                <input
-                                                    type="text"
-                                                    className="w-full rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-white focus:ring-2 focus:ring-[#037995] focus:outline-none"
-                                                    placeholder="MM/AA"
-                                                    maxLength={5}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm font-medium text-gray-300">CVV</label>
-                                                <input
-                                                    type="text"
-                                                    className="w-full rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-white focus:ring-2 focus:ring-[#037995] focus:outline-none"
-                                                    placeholder="123"
-                                                    maxLength={3}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label className="mb-1 block text-sm font-medium text-gray-300">Nombre en la Tarjeta</label>
-                                            <input
-                                                type="text"
-                                                className="w-full rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-white focus:ring-2 focus:ring-[#037995] focus:outline-none"
-                                                placeholder="JUAN PEREZ"
-                                            />
-                                        </div>
-
-                                        <div className="mt-6">
-                                            <label className="flex items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    className="h-4 w-4 rounded border-gray-600 text-[#037995] focus:ring-[#037995]"
-                                                />
-                                                <span className="ml-2 text-sm text-gray-300">
-                                                    Acepto los{' '}
-                                                    <a href="#" className="text-[#037995] hover:underline">
-                                                        términos y condiciones
-                                                    </a>{' '}
-                                                    y la{' '}
-                                                    <a href="#" className="text-[#037995] hover:underline">
-                                                        política de privacidad
-                                                    </a>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <button
-                                            onClick={completePayment}
-                                            className="mt-6 flex w-full items-center justify-center rounded-lg bg-[#037995] px-4 py-3 font-medium text-white shadow-lg transition-all duration-300 hover:bg-[#026980]"
-                                        >
-                                            <span className="mr-2">Completar Pago</span>
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-5 w-5"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            >
-                                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </TabsContent>
-
-                                <TabsContent value="Efetivo" className="mt-10">
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="mb-1 block text-sm font-medium text-gray-300">Número de Tarjeta</label>
-                                            <input
-                                                type="text"
-                                                className="w-full rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-white focus:ring-2 focus:ring-[#037995] focus:outline-none"
-                                                placeholder="1234 5678 9012 3456"
-                                                maxLength={19}
-                                            />
-                                        </div>
-
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="mb-1 block text-sm font-medium text-gray-300">Fecha de Expiración</label>
-                                                <input
-                                                    type="text"
-                                                    className="w-full rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-white focus:ring-2 focus:ring-[#037995] focus:outline-none"
-                                                    placeholder="MM/AA"
-                                                    maxLength={5}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="mb-1 block text-sm font-medium text-gray-300">CVV</label>
-                                                <input
-                                                    type="text"
-                                                    className="w-full rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-white focus:ring-2 focus:ring-[#037995] focus:outline-none"
-                                                    placeholder="123"
-                                                    maxLength={3}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label className="mb-1 block text-sm font-medium text-gray-300">Nombre en la Tarjeta</label>
-                                            <input
-                                                type="text"
-                                                className="w-full rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-white focus:ring-2 focus:ring-[#037995] focus:outline-none"
-                                                placeholder="JUAN PEREZ"
-                                            />
-                                        </div>
-
-                                        <div className="mt-6">
-                                            <label className="flex items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    className="h-4 w-4 rounded border-gray-600 text-[#037995] focus:ring-[#037995]"
-                                                />
-                                                <span className="ml-2 text-sm text-gray-300">
-                                                    Acepto los{' '}
-                                                    <a href="#" className="text-[#037995] hover:underline">
-                                                        términos y condiciones
-                                                    </a>{' '}
-                                                    y la{' '}
-                                                    <a href="#" className="text-[#037995] hover:underline">
-                                                        política de privacidad
-                                                    </a>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <button className="mt-6 flex w-full items-center justify-center rounded-lg bg-[#037995] px-4 py-3 font-medium text-white shadow-lg transition-all duration-300 hover:bg-[#026980]">
-                                            <span className="mr-2">Completar Pago</span>
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-5 w-5"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            >
-                                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </TabsContent>
-                            </Tabs>
-                        </div>
+                        <PaymentForm onCompletePayment={completePayment} />
 
                         {/* Resumen de compra */}
                         <div className="rounded-lg bg-gray-700 p-4">
