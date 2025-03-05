@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
+import { LogOut } from 'lucide-react';
 import { useState } from 'react';
 import {
     DropdownMenu,
@@ -105,7 +106,13 @@ export function AppSidebarHeaderClient() {
                                         <DropdownMenuItem>Mis Reservas</DropdownMenuItem>
                                         <DropdownMenuItem>Mis Envíos</DropdownMenuItem>
                                         <DropdownMenuItem>Configuración</DropdownMenuItem>
-                                        <DropdownMenuItem>Cerrar Sesión</DropdownMenuItem>
+
+                                        <DropdownMenuItem asChild>
+                                            <Link className="block w-full" method="post" href={route('logout')} as="button">
+                                                <LogOut className="mr-2" />
+                                                Cerrar Sesión
+                                            </Link>
+                                        </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
